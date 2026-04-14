@@ -1,0 +1,148 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: 🚢
+      - generic [ref=e5]: Sovereign Logistics
+      - generic [ref=e7]: Tablero de Contenedores
+    - generic [ref=e8]:
+      - generic [ref=e9]: Ana López · Operadora
+      - button "Exportar" [ref=e10] [cursor=pointer]
+      - button "+ Nuevo Contenedor" [ref=e11] [cursor=pointer]
+  - generic [ref=e12]:
+    - generic [ref=e13]: 🔍 Buscar contenedor o cliente...
+    - generic [ref=e14] [cursor=pointer]: Todos — 38
+    - generic [ref=e15] [cursor=pointer]: En Proceso — 21
+    - generic [ref=e16] [cursor=pointer]: ▲ Detenidos — 3
+    - generic [ref=e17] [cursor=pointer]: ✓ Entregados — 142
+    - generic [ref=e18] [cursor=pointer]: Programados — 12
+    - generic [ref=e19] [cursor=pointer]: LCL
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: ◇ Puerto Origen
+        - generic [ref=e24]: "4"
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: EISU9023456
+        - generic [ref=e27]: Muebles Guadalajara
+        - generic [ref=e28]: Tianjin · Salida 18 Abr
+        - generic [ref=e30]: ETA 29 Abr
+      - generic [ref=e31] [cursor=pointer]:
+        - generic [ref=e32]: MSCU8872341
+        - generic [ref=e33]: 3 clientes
+        - generic [ref=e34]: Ningbo · Salida 20 Abr
+        - generic [ref=e35]:
+          - generic [ref=e36]: ETA 02 May
+          - generic [ref=e37]: LCL
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: ● Zarpó
+        - generic [ref=e41]: "5"
+      - generic [ref=e42] [cursor=pointer]:
+        - generic [ref=e43]: MSCU1234098
+        - generic [ref=e44]: 2 clientes
+        - generic [ref=e45]: Shenzhen · 12 Abr
+        - generic [ref=e46]:
+          - generic [ref=e47]: ETA 02 May
+          - generic [ref=e48]: LCL
+      - generic [ref=e49] [cursor=pointer]:
+        - generic [ref=e50]: OOLU4412890
+        - generic [ref=e51]: Química Bajío SA
+        - generic [ref=e52]: Guangzhou · 10 Abr
+        - generic [ref=e54]: ETA 28 Abr
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - generic [ref=e57]: ● Tránsito Mar.
+        - generic [ref=e58]: "8"
+      - generic [ref=e59] [cursor=pointer]:
+        - generic [ref=e60]: MSCU7432110
+        - generic [ref=e61]: Textiles Monterrey
+        - generic [ref=e62]: Shanghai → Manzanillo
+        - generic [ref=e64]: ETA 18 Abr
+      - generic [ref=e65] [cursor=pointer]:
+        - generic [ref=e66]: HLXU5512340
+        - generic [ref=e67]: Autopartes del Centro
+        - generic [ref=e68]: Tianjin → Lázaro Cárdenas
+        - generic [ref=e70]: ETA 25 Abr
+      - generic [ref=e71] [cursor=pointer]:
+        - generic [ref=e72]: TEMU3349021
+        - generic [ref=e73]: Plásticos Noreste
+        - generic [ref=e74]: Qingdao → Manzanillo
+        - generic [ref=e76]: ETA 30 Abr
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]: ◆ ETA Destino
+        - generic [ref=e80]: "3"
+      - generic [ref=e81] [cursor=pointer]:
+        - generic [ref=e82]: APZU7712034
+        - generic [ref=e83]: Importadora Noreste
+        - generic [ref=e84]: "Llegada: mañana · Veracruz"
+        - generic [ref=e86]: Mañana
+    - generic [ref=e87]:
+      - generic [ref=e88]:
+        - generic [ref=e89]: ◆ En Aduana
+        - generic [ref=e90]: "4"
+      - generic [ref=e91] [cursor=pointer]:
+        - generic [ref=e92]: CMAU4859021
+        - generic [ref=e93]: Electrónica del Norte
+        - generic [ref=e94]: Manzanillo · 2 días
+        - generic [ref=e96]: +2d sin update
+      - generic [ref=e97] [cursor=pointer]:
+        - generic [ref=e98]: APZU4120985
+        - generic [ref=e99]: Ferretería Nacional
+        - generic [ref=e100]: Lázaro Cárdenas · 1 día
+        - generic [ref=e102]: Normal
+    - generic [ref=e103]:
+      - generic [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]: ▲
+          - text: Detenido
+        - generic [ref=e107]: "3"
+      - generic [ref=e108] [cursor=pointer]:
+        - generic [ref=e109]: HLXU3012847
+        - generic [ref=e110]: 3 clientes — LCL
+        - generic [ref=e111]: Manzanillo · 4 días
+        - generic [ref=e112]:
+          - generic [ref=e113]: ▲ Urgente 4d
+          - generic [ref=e114]: LCL
+      - generic [ref=e115] [cursor=pointer]:
+        - generic [ref=e116]: SUDU7219034
+        - generic [ref=e117]: Confecciones CDMX
+        - generic [ref=e118]: Veracruz · 2 días
+        - generic [ref=e120]: ▲ Revisar 2d
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]: ✓ Liberado
+        - generic [ref=e124]: "3"
+      - generic [ref=e125] [cursor=pointer]:
+        - generic [ref=e126]: GESU4499012
+        - generic [ref=e127]: Importaciones CDMX
+        - generic [ref=e128]: "Liberado: 13 Abr"
+        - generic [ref=e130]: ✓ Libre
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]: ◆ T. Terrestre
+        - generic [ref=e134]: "4"
+      - generic [ref=e135] [cursor=pointer]:
+        - generic [ref=e136]: TCNU6784512
+        - generic [ref=e137]: Importadora Bajío
+        - generic [ref=e138]: Manzanillo → Guadalajara
+        - generic [ref=e140]: "ETA: 15 Abr"
+      - generic [ref=e141] [cursor=pointer]:
+        - generic [ref=e142]: BMOU3312098
+        - generic [ref=e143]: Tecnología Occidente
+        - generic [ref=e144]: Veracruz → CDMX
+        - generic [ref=e146]: "ETA: 16 Abr"
+    - generic [ref=e147]:
+      - generic [ref=e148]:
+        - generic [ref=e149]: ✓ Entregado
+        - generic [ref=e150]: "142"
+      - generic [ref=e151] [cursor=pointer]:
+        - generic [ref=e152]: MSCU0099234
+        - generic [ref=e153]: Calzado León SA
+        - generic [ref=e154]: "Entregado: 10 Abr"
+        - generic [ref=e156]: ✓ Entregado
+      - generic [ref=e157] [cursor=pointer]:
+        - generic [ref=e158]: OOLU3312456
+        - generic [ref=e159]: Plásticos Noreste
+        - generic [ref=e160]: "Entregado: 08 Abr"
+        - generic [ref=e162]: ✓ Entregado

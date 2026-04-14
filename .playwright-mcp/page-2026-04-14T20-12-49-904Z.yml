@@ -1,0 +1,155 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: 🚢
+      - generic [ref=e5]:
+        - text: ContainerOS
+        - generic [ref=e6]: Logística China · México
+    - navigation [ref=e7]:
+      - generic [ref=e8] [cursor=pointer]:
+        - generic [ref=e9]: 📊
+        - text: Dashboard
+      - generic [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: 📦
+        - text: Contenedores
+      - generic [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: 👥
+        - text: Clientes
+      - generic [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: 📄
+        - text: Facturas
+      - generic [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]: 📈
+        - text: Reportes
+      - generic [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]: ⚙️
+        - text: Configuración
+    - generic [ref=e21]:
+      - generic [ref=e22]: RG
+      - generic [ref=e23]:
+        - generic [ref=e24]: Roberto García
+        - generic [ref=e25]: Director Principal
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]: Dashboard de Dirección
+        - generic [ref=e30]: Vista gerencial · Solo lectura
+      - generic [ref=e31]:
+        - generic [ref=e32]: Abr 2026 · Q2
+        - generic [ref=e33] [cursor=pointer]: Filtrar período
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e37]: Resumen Operativo
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e40]: ● Activos
+            - generic [ref=e41]: "38"
+            - generic [ref=e42]: ↑ 4 vs. mes anterior
+          - generic [ref=e43]:
+            - generic [ref=e44]: ◆ En Proceso
+            - generic [ref=e45]: "21"
+            - generic [ref=e46]: Tránsito o aduana
+          - generic [ref=e47]:
+            - generic [ref=e48]: ▲ Detenidos
+            - generic [ref=e49]: "3"
+            - generic [ref=e50]: ↑ 2 esta semana
+          - generic [ref=e51]:
+            - generic [ref=e52]: ✓ Entregados
+            - generic [ref=e53]: "142"
+            - generic [ref=e54]: ↑ 18% vs. Q1
+          - generic [ref=e55]:
+            - generic [ref=e56]: ◇ Programados
+            - generic [ref=e57]: "12"
+            - generic [ref=e58]: Próx. 30 días
+          - generic [ref=e59]:
+            - generic [ref=e60]: ○ Inactivos
+            - generic [ref=e61]: "5"
+            - generic [ref=e62]: Sin movimiento +15d
+      - generic [ref=e63]:
+        - generic [ref=e64]: "ESTADOS:"
+        - generic [ref=e65]: Puerto Origen
+        - generic [ref=e67]: En Tránsito
+        - generic [ref=e69]: En Aduana
+        - generic [ref=e71]: Detenido ▲
+        - generic [ref=e73]: Tránsito Terrestre
+        - generic [ref=e75]: Entregado ✓
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e80]: Contenedores Activos
+            - generic [ref=e81] [cursor=pointer]: Ver todos →
+          - table [ref=e83]:
+            - rowgroup [ref=e84]:
+              - row "Contenedor Cliente Puerto Origen ETA Estado" [ref=e85]:
+                - columnheader "Contenedor" [ref=e86]
+                - columnheader "Cliente" [ref=e87]
+                - columnheader "Puerto Origen" [ref=e88]
+                - columnheader "ETA" [ref=e89]
+                - columnheader "Estado" [ref=e90]
+            - rowgroup [ref=e91]:
+              - row "MSCU7432110 Textiles Monterrey SA Shanghai 18 Abr ● En Tránsito" [ref=e92]:
+                - cell "MSCU7432110" [ref=e93]
+                - cell "Textiles Monterrey SA" [ref=e94]
+                - cell "Shanghai" [ref=e95]
+                - cell "18 Abr" [ref=e96]
+                - cell "● En Tránsito" [ref=e97]:
+                  - generic [ref=e98]: ● En Tránsito
+              - row "CMAU4859021 Electrónica del Norte Guangzhou 22 Abr ◆ En Aduana" [ref=e99]:
+                - cell "CMAU4859021" [ref=e100]
+                - cell "Electrónica del Norte" [ref=e101]
+                - cell "Guangzhou" [ref=e102]
+                - cell "22 Abr" [ref=e103]
+                - cell "◆ En Aduana" [ref=e104]:
+                  - generic [ref=e105]: ◆ En Aduana
+              - row "HLXU3012847 3 clientes (LCL) Ningbo 15 Abr ▲ Detenido" [ref=e106]:
+                - cell "HLXU3012847" [ref=e107]
+                - cell "3 clientes (LCL)" [ref=e108]
+                - cell "Ningbo" [ref=e109]
+                - cell "15 Abr" [ref=e110]
+                - cell "▲ Detenido" [ref=e111]:
+                  - generic [ref=e112]: ▲ Detenido
+              - row "EISU9023456 Muebles Guadalajara Tianjin 29 Abr ◇ Puerto Origen" [ref=e113]:
+                - cell "EISU9023456" [ref=e114]
+                - cell "Muebles Guadalajara" [ref=e115]
+                - cell "Tianjin" [ref=e116]
+                - cell "29 Abr" [ref=e117]
+                - cell "◇ Puerto Origen" [ref=e118]:
+                  - generic [ref=e119]: ◇ Puerto Origen
+              - row "TCNU6784512 Importadora Bajío Shanghai 14 Abr ◆ T. Terrestre" [ref=e120]:
+                - cell "TCNU6784512" [ref=e121]
+                - cell "Importadora Bajío" [ref=e122]
+                - cell "Shanghai" [ref=e123]
+                - cell "14 Abr" [ref=e124]
+                - cell "◆ T. Terrestre" [ref=e125]:
+                  - generic [ref=e126]: ◆ T. Terrestre
+              - row "MSCU1234098 2 clientes (LCL) Shenzhen 02 May ● Zarpó" [ref=e127]:
+                - cell "MSCU1234098" [ref=e128]
+                - cell "2 clientes (LCL)" [ref=e129]
+                - cell "Shenzhen" [ref=e130]
+                - cell "02 May" [ref=e131]
+                - cell "● Zarpó" [ref=e132]:
+                  - generic [ref=e133]: ● Zarpó
+        - generic [ref=e134]:
+          - generic [ref=e136]: ▲ Alertas — Requieren Atención
+          - generic [ref=e137]:
+            - generic [ref=e138]:
+              - generic [ref=e139]:
+                - generic [ref=e140]: ⬛
+                - generic [ref=e141]:
+                  - generic [ref=e142]: ▲ HLXU3012847 — Detenido
+                  - generic [ref=e143]: Aduana MANZANILLO · 4 días detenido
+              - generic [ref=e144]: Hace 4d
+            - generic [ref=e145]:
+              - generic [ref=e146]:
+                - generic [ref=e147]: ⬛
+                - generic [ref=e148]:
+                  - generic [ref=e149]: ▲ CMAU4859021 — En Aduana
+                  - generic [ref=e150]: +2 días sin actualización
+              - generic [ref=e151]: Hace 2d
+            - generic [ref=e152]:
+              - generic [ref=e153]:
+                - generic [ref=e154]: ◆
+                - generic [ref=e155]:
+                  - generic [ref=e156]: ◆ TCNU6784512 — ETA hoy
+                  - generic [ref=e157]: Sin confirmación de llegada
+              - generic [ref=e158]: Hoy

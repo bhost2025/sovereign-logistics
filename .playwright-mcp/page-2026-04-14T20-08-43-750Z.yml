@@ -1,0 +1,148 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: 🚢 ContainerOS
+      - generic [ref=e5]: "|"
+      - generic [ref=e6]: Tablero de Contenedores
+    - generic [ref=e7]:
+      - generic [ref=e8]: Ana López · Operadora
+      - button "Exportar" [ref=e9] [cursor=pointer]
+      - button "+ Nuevo Contenedor" [ref=e10] [cursor=pointer]
+  - generic [ref=e11]:
+    - generic [ref=e12]: 🔍 Buscar contenedor o cliente...
+    - generic [ref=e13] [cursor=pointer]: Todos (38)
+    - generic [ref=e14] [cursor=pointer]: En Proceso (21)
+    - generic [ref=e15] [cursor=pointer]: ▲ Detenidos (3)
+    - generic [ref=e16] [cursor=pointer]: ✓ Entregados (142)
+    - generic [ref=e17] [cursor=pointer]: ◇ Programados (12)
+    - generic [ref=e18] [cursor=pointer]: LCL
+    - generic [ref=e19] [cursor=pointer]: Shanghai
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - text: ◇ Puerto Origen
+        - generic [ref=e23]: "4"
+      - generic [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: EISU9023456
+        - generic [ref=e26]: Muebles Guadalajara
+        - generic [ref=e27]: "Tianjin · Salida: 18 Abr"
+        - generic [ref=e29]: ETA 29 Abr
+      - generic [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: MSCU8872341
+        - generic [ref=e32]: 3 clientes (LCL)
+        - generic [ref=e33]: "Ningbo · Salida: 20 Abr"
+        - generic [ref=e34]:
+          - generic [ref=e35]: ETA 02 May
+          - generic [ref=e36]: LCL
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - text: ● Zarpó
+        - generic [ref=e39]: "5"
+      - generic [ref=e40] [cursor=pointer]:
+        - generic [ref=e41]: MSCU1234098
+        - generic [ref=e42]: 2 clientes (LCL)
+        - generic [ref=e43]: "Shenzhen · Zarpó: 12 Abr"
+        - generic [ref=e44]:
+          - generic [ref=e45]: ETA 02 May
+          - generic [ref=e46]: LCL
+      - generic [ref=e47] [cursor=pointer]:
+        - generic [ref=e48]: OOLU4412890
+        - generic [ref=e49]: Química Bajío SA
+        - generic [ref=e50]: "Guangzhou · Zarpó: 10 Abr"
+        - generic [ref=e52]: ETA 28 Abr
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - text: ● Tránsito Mar.
+        - generic [ref=e55]: "8"
+      - generic [ref=e56] [cursor=pointer]:
+        - generic [ref=e57]: MSCU7432110
+        - generic [ref=e58]: Textiles Monterrey
+        - generic [ref=e59]: Shanghai → Manzanillo
+        - generic [ref=e61]: ETA 18 Abr
+      - generic [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]: HLXU5512340
+        - generic [ref=e64]: Autopartes del Centro
+        - generic [ref=e65]: Tianjin → Lázaro Cárdenas
+        - generic [ref=e67]: ETA 25 Abr
+      - generic [ref=e68] [cursor=pointer]:
+        - generic [ref=e69]: TEMU3349021
+        - generic [ref=e70]: Plásticos Noreste
+        - generic [ref=e71]: Qingdao → Manzanillo
+        - generic [ref=e73]: ETA 30 Abr
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - text: ◆ ETA Destino
+        - generic [ref=e76]: "3"
+      - generic [ref=e77] [cursor=pointer]:
+        - generic [ref=e78]: APZU7712034
+        - generic [ref=e79]: Importadora Noreste
+        - generic [ref=e80]: "Llegada: mañana · Veracruz"
+        - generic [ref=e82]: Mañana
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - text: ◆ En Aduana
+        - generic [ref=e85]: "4"
+      - generic [ref=e86] [cursor=pointer]:
+        - generic [ref=e87]: CMAU4859021
+        - generic [ref=e88]: Electrónica del Norte
+        - generic [ref=e89]: Manzanillo · 2 días
+        - generic [ref=e91]: +2d sin update
+      - generic [ref=e92] [cursor=pointer]:
+        - generic [ref=e93]: APZU4120985
+        - generic [ref=e94]: Ferretería Nacional
+        - generic [ref=e95]: Lázaro Cárdenas · 1 día
+        - generic [ref=e97]: Normal
+    - generic [ref=e98]:
+      - generic [ref=e99]:
+        - generic [ref=e100]: ▲
+        - text: Detenido
+        - generic [ref=e101]: "3"
+      - generic [ref=e102] [cursor=pointer]:
+        - generic [ref=e103]: HLXU3012847
+        - generic [ref=e104]: 3 clientes (LCL)
+        - generic [ref=e105]: Manzanillo · 4 días detenido
+        - generic [ref=e106]:
+          - generic [ref=e107]: ▲ Urgente 4d
+          - generic [ref=e108]: LCL
+      - generic [ref=e109] [cursor=pointer]:
+        - generic [ref=e110]: SUDU7219034
+        - generic [ref=e111]: Confecciones CDMX
+        - generic [ref=e112]: Veracruz · 2 días detenido
+        - generic [ref=e114]: ▲ Revisar 2d
+    - generic [ref=e115]:
+      - generic [ref=e116]:
+        - text: ✓ Liberado
+        - generic [ref=e117]: "3"
+      - generic [ref=e118] [cursor=pointer]:
+        - generic [ref=e119]: GESU4499012
+        - generic [ref=e120]: Importaciones CDMX
+        - generic [ref=e121]: "Liberado: 13 Abr"
+        - generic [ref=e123]: ✓ Libre
+    - generic [ref=e124]:
+      - generic [ref=e125]:
+        - text: ◆ T. Terrestre
+        - generic [ref=e126]: "4"
+      - generic [ref=e127] [cursor=pointer]:
+        - generic [ref=e128]: TCNU6784512
+        - generic [ref=e129]: Importadora Bajío
+        - generic [ref=e130]: Manzanillo → Guadalajara
+        - generic [ref=e132]: "ETA: 15 Abr"
+      - generic [ref=e133] [cursor=pointer]:
+        - generic [ref=e134]: BMOU3312098
+        - generic [ref=e135]: Tecnología Occidente
+        - generic [ref=e136]: Veracruz → CDMX
+        - generic [ref=e138]: "ETA: 16 Abr"
+    - generic [ref=e139]:
+      - generic [ref=e140]:
+        - text: ✓ Entregado
+        - generic [ref=e141]: "142"
+      - generic [ref=e142] [cursor=pointer]:
+        - generic [ref=e143]: MSCU0099234
+        - generic [ref=e144]: Calzado León SA
+        - generic [ref=e145]: "Entregado: 10 Abr"
+        - generic [ref=e147]: ✓ Entregado
+      - generic [ref=e148] [cursor=pointer]:
+        - generic [ref=e149]: OOLU3312456
+        - generic [ref=e150]: Plásticos Noreste
+        - generic [ref=e151]: "Entregado: 08 Abr"
+        - generic [ref=e153]: ✓ Entregado

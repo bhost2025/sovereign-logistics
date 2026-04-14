@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura — Container Tracking SaaS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0A1A3C; font-family: 'Segoe UI', system-ui, sans-serif; color: #fff; padding: 32px; min-height: 100vh; }
+  h1 { font-size: 18px; font-weight: 600; color: #7EB3FF; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #4A6FA5; margin-bottom: 40px; }
+
+  .arch { display: flex; flex-direction: column; gap: 24px; max-width: 900px; margin: 0 auto; }
+
+  /* Layer */
+  .layer { border: 1px solid rgba(126,179,255,0.2); border-radius: 12px; padding: 20px 24px; background: rgba(255,255,255,0.03); }
+  .layer-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #4A6FA5; margin-bottom: 14px; }
+  .boxes { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .box { border-radius: 8px; padding: 12px 18px; font-size: 13px; font-weight: 500; display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+  .box .tech { font-size: 10px; font-weight: 400; opacity: 0.6; margin-top: 2px; }
+
+  /* Colors per layer */
+  .clients .box  { background: #1A2E5A; border: 1px solid #2A4A8A; color: #A8C8FF; }
+  .frontend .box { background: #0D3A2E; border: 1px solid #1A6A50; color: #5EE8B0; }
+  .backend .box  { background: #2A1A3C; border: 1px solid #5A3A7A; color: #C8A8FF; }
+  .data .box     { background: #3A2000; border: 1px solid #7A4A00; color: #FFB85E; }
+  .infra .box    { background: #1A1A2E; border: 1px solid #3A3A6A; color: #A8A8FF; }
+
+  /* Arrow */
+  .arrow { display: flex; align-items: center; justify-content: center; gap: 8px; color: #2A4A8A; font-size: 11px; }
+  .arrow::before, .arrow::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #2A4A8A, transparent); }
+
+  /* Badge */
+  .badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+  .badge-mvp { background: #1A5A30; color: #5EE890; }
+  .badge-v2  { background: #3A2800; color: #FFB030; }
+
+  .note { margin-top: 32px; background: rgba(126,179,255,0.06); border: 1px solid rgba(126,179,255,0.15); border-radius: 10px; padding: 16px 20px; font-size: 12px; color: #7EB3FF; line-height: 1.7; }
+  .note strong { color: #fff; }
+  ul { padding-left: 16px; margin-top: 6px; }
+  ul li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Arquitectura del Sistema</h1>
+<p class="subtitle">Container Tracking SaaS — China → México &nbsp;·&nbsp; Stack: Supabase + Next.js + Expo</p>
+
+<div class="arch">
+
+  <!-- Clients -->
+  <div class="layer clients">
+    <div class="layer-label">Clientes / Usuarios</div>
+    <div class="boxes">
+      <div class="box">
+        Super Admin
+        <span class="tech">Configuración del sistema</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Operador Logístico
+        <span class="tech">CRUD contenedores · Carga de facturas</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Director Principal
+        <span class="tech">Dashboard read-only</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Cliente Final
+        <span class="tech">Portal de seguimiento propio</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">Acceso vía Web + App Móvil</div>
+
+  <!-- Frontend -->
+  <div class="layer frontend">
+    <div class="layer-label">Frontend</div>
+    <div class="boxes">
+      <div class="box">
+        Next.js 14 (Web)
+        <span class="tech">App Router · Tailwind CSS · shadcn/ui</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        React Native (Expo)
+        <span class="tech">iOS + Android · Shared types con Web</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">HTTPS · REST / Supabase Client SDK</div>
+
+  <!-- Backend -->
+  <div class="layer backend">
+    <div class="layer-label">Backend / API</div>
+    <div class="boxes">
+      <div class="box">
+        Next.js API Routes
+        <span class="tech">Lógica de negocio · Validación · Controladores</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Supabase Auth
+        <span class="tech">JWT · RBAC · Sesiones</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Supabase Edge Functions
+        <span class="tech">Notificaciones email · Webhooks</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">Supabase Client · Row Level Security</div>
+
+  <!-- Data -->
+  <div class="layer data">
+    <div class="layer-label">Datos</div>
+    <div class="boxes">
+      <div class="box">
+        PostgreSQL (Supabase)
+        <span class="tech">Contenedores · Clientes · Facturas · Estados · Roles</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Supabase Storage
+        <span class="tech">PDFs de facturas · Packing Lists</span>
+        <span class="badge badge-mvp">MVP</span>
+      </div>
+      <div class="box">
+        Supabase Realtime
+        <span class="tech">Cambios de estado en tiempo real</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">Integraciones Externas</div>
+
+  <!-- Infra -->
+  <div class="layer infra">
+    <div class="layer-label">Integraciones Externas</div>
+    <div class="boxes">
+      <div class="box">
+        Resend / SendGrid
+        <span class="tech">Notificaciones email</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+      <div class="box">
+        WhatsApp (Twilio/Meta)
+        <span class="tech">Alertas omnicanal</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+      <div class="box">
+        Project44 / APIs Navieras
+        <span class="tech">Tracking automático por B/L</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+      <div class="box">
+        OCR IA
+        <span class="tech">Extracción de facturas PDF</span>
+        <span class="badge badge-v2">Fase 2</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="note">
+  <strong>Puntos clave de diseño:</strong>
+  <ul>
+    <li>Multi-tenant desde el día 1 — Row Level Security en Supabase garantiza aislamiento de datos por empresa.</li>
+    <li>Un contenedor puede tener productos de múltiples clientes finales (carga consolidada LCL). El modelo de datos lo soporta nativamente.</li>
+    <li>Next.js y Expo comparten tipos TypeScript — una sola fuente de verdad para los modelos de datos.</li>
+    <li>Todo marcado como "Fase 2" está contemplado en el esquema de BD desde el MVP para no romper la arquitectura al escalar.</li>
+  </ul>
+</div>
+
+</body>
+</html>

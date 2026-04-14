@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esquema BD — Container Tracking SaaS</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0A1A3C; font-family: 'Segoe UI', system-ui, monospace; color: #fff; padding: 32px; }
+  h1 { font-size: 16px; font-weight: 600; color: #7EB3FF; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
+  .subtitle { font-size: 12px; color: #4A6FA5; margin-bottom: 32px; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; }
+
+  .table { border: 1px solid rgba(126,179,255,0.2); border-radius: 10px; overflow: hidden; }
+  .table-header { padding: 10px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .table-body { padding: 0; }
+
+  .field { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-top: 1px solid rgba(255,255,255,0.04); font-size: 11px; gap: 8px; }
+  .field-name { color: #E0E0E0; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .field-type { color: #4A6FA5; font-family: monospace; font-size: 10px; }
+
+  .pk { color: #FFD700; font-size: 9px; font-weight: 700; }
+  .fk { color: #7EB3FF; font-size: 9px; font-weight: 700; }
+  .idx { color: #5EE8B0; font-size: 9px; font-weight: 700; }
+
+  /* Table colors */
+  .t-companies .table-header  { background: #1A2E5A; color: #A8C8FF; }
+  .t-companies .table-body    { background: #0D1E3A; }
+
+  .t-users .table-header      { background: #1A3A2A; color: #5EE8B0; }
+  .t-users .table-body        { background: #0D2419; }
+
+  .t-containers .table-header { background: #2A1A3C; color: #C8A8FF; }
+  .t-containers .table-body   { background: #1A0D26; }
+
+  .t-statuses .table-header   { background: #3A2000; color: #FFB85E; }
+  .t-statuses .table-body     { background: #261600; }
+
+  .t-clients .table-header    { background: #1A2A3A; color: #88C8FF; }
+  .t-clients .table-body      { background: #0D1A26; }
+
+  .t-invoices .table-header   { background: #1A3A1A; color: #88FF88; }
+  .t-invoices .table-body     { background: #0D260D; }
+
+  .t-container_clients .table-header { background: #3A1A2A; color: #FFB8D0; }
+  .t-container_clients .table-body   { background: #260D1A; }
+
+  .t-status_log .table-header { background: #2A2A00; color: #FFFF88; }
+  .t-status_log .table-body   { background: #1A1A00; }
+
+  .enum-box { margin-top: 20px; border: 1px solid rgba(255,184,94,0.3); border-radius: 10px; overflow: hidden; max-width: 1100px; }
+  .enum-header { background: #3A2000; color: #FFB85E; padding: 10px 14px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .enum-body { background: #1A0F00; padding: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .enum-val { background: rgba(255,184,94,0.1); border: 1px solid rgba(255,184,94,0.25); border-radius: 6px; padding: 4px 12px; font-size: 11px; color: #FFB85E; font-family: monospace; }
+
+  .relations { margin-top: 20px; max-width: 1100px; border: 1px solid rgba(126,179,255,0.15); border-radius: 10px; padding: 16px 20px; background: rgba(255,255,255,0.02); }
+  .relations h3 { font-size: 11px; font-weight: 700; color: #4A6FA5; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .rel { font-size: 11px; color: #7EB3FF; margin-bottom: 6px; font-family: monospace; }
+  .rel span { color: #4A6FA5; }
+</style>
+</head>
+<body>
+<h1>Esquema de Base de Datos</h1>
+<p class="subtitle">PostgreSQL via Supabase · Multi-tenant con Row Level Security · 8 tablas core</p>
+
+<div class="grid">
+
+  <!-- companies -->
+  <div class="table t-companies">
+    <div class="table-header">companies <span style="font-size:9px;opacity:0.6">(tenants)</span></div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">slug</span><span class="field-type">text unique</span></div>
+      <div class="field"><span class="field-name">logo_url</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">is_active</span><span class="field-type">bool</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- users -->
+  <div class="table t-users">
+    <div class="table-header">users <span style="font-size:9px;opacity:0.6">(perfiles + roles)</span></div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid (= auth.users)</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> company_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">full_name</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">email</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">role</span><span class="field-type">user_role enum</span></div>
+      <div class="field"><span class="field-name">is_active</span><span class="field-type">bool</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- clients -->
+  <div class="table t-clients">
+    <div class="table-header">clients <span style="font-size:9px;opacity:0.6">(clientes finales)</span></div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> company_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">name</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">contact_name</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">email</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">phone</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">is_active</span><span class="field-type">bool</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- containers -->
+  <div class="table t-containers">
+    <div class="table-header">containers</div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> company_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="idx">IDX</span> container_number</span><span class="field-type">text unique</span></div>
+      <div class="field"><span class="field-name">bl_number</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">origin_port</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">destination_port</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">current_status</span><span class="field-type">container_status</span></div>
+      <div class="field"><span class="field-name">departure_date</span><span class="field-type">date?</span></div>
+      <div class="field"><span class="field-name">eta_date</span><span class="field-type">date?</span></div>
+      <div class="field"><span class="field-name">arrival_date</span><span class="field-type">date?</span></div>
+      <div class="field"><span class="field-name">notes</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">created_by</span><span class="field-type">uuid (FK users)</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+      <div class="field"><span class="field-name">updated_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- container_clients (pivot LCL) -->
+  <div class="table t-container_clients">
+    <div class="table-header">container_clients <span style="font-size:9px;opacity:0.6">(LCL pivot)</span></div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> container_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> client_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">share_pct</span><span class="field-type">numeric?</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- invoices -->
+  <div class="table t-invoices">
+    <div class="table-header">invoices <span style="font-size:9px;opacity:0.6">(facturas / packing)</span></div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> container_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> client_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">invoice_number</span><span class="field-type">text</span></div>
+      <div class="field"><span class="field-name">description</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">declared_value</span><span class="field-type">numeric?</span></div>
+      <div class="field"><span class="field-name">currency</span><span class="field-type">text default 'USD'</span></div>
+      <div class="field"><span class="field-name">file_url</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">created_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+  <!-- status_log -->
+  <div class="table t-status_log">
+    <div class="table-header">container_status_log</div>
+    <div class="table-body">
+      <div class="field"><span class="field-name"><span class="pk">PK</span> id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name"><span class="fk">FK</span> container_id</span><span class="field-type">uuid</span></div>
+      <div class="field"><span class="field-name">previous_status</span><span class="field-type">container_status?</span></div>
+      <div class="field"><span class="field-name">new_status</span><span class="field-type">container_status</span></div>
+      <div class="field"><span class="field-name">changed_by</span><span class="field-type">uuid (FK users)</span></div>
+      <div class="field"><span class="field-name">notes</span><span class="field-type">text?</span></div>
+      <div class="field"><span class="field-name">changed_at</span><span class="field-type">timestamptz</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ENUM -->
+<div class="enum-box">
+  <div class="enum-header">ENUM: container_status — 9 estados del viaje</div>
+  <div class="enum-body">
+    <span class="enum-val">en_puerto_origen</span>
+    <span class="enum-val">zarpo</span>
+    <span class="enum-val">en_transito_maritimo</span>
+    <span class="enum-val">eta_puerto_destino</span>
+    <span class="enum-val">en_aduana</span>
+    <span class="enum-val">liberado_aduana</span>
+    <span class="enum-val">detenido_aduana</span>
+    <span class="enum-val">transito_terrestre</span>
+    <span class="enum-val">entregado</span>
+  </div>
+</div>
+
+<!-- ENUM roles -->
+<div class="enum-box" style="margin-top:12px; border-color: rgba(94,232,176,0.3);">
+  <div class="enum-header" style="background:#1A3A2A; color:#5EE8B0;">ENUM: user_role — Roles del sistema</div>
+  <div class="enum-body" style="background:#0D2419;">
+    <span class="enum-val" style="background:rgba(94,232,176,0.1); border-color:rgba(94,232,176,0.25); color:#5EE8B0;">super_admin</span>
+    <span class="enum-val" style="background:rgba(94,232,176,0.1); border-color:rgba(94,232,176,0.25); color:#5EE8B0;">operator</span>
+    <span class="enum-val" style="background:rgba(94,232,176,0.1); border-color:rgba(94,232,176,0.25); color:#5EE8B0;">director</span>
+    <span class="enum-val" style="background:rgba(94,232,176,0.1); border-color:rgba(94,232,176,0.25); color:#5EE8B0;">client_viewer</span>
+  </div>
+</div>
+
+<!-- Relations -->
+<div class="relations">
+  <h3>Relaciones clave</h3>
+  <div class="rel">companies <span>1 →</span> N users</div>
+  <div class="rel">companies <span>1 →</span> N clients <span>(clientes finales de esa empresa logística)</span></div>
+  <div class="rel">companies <span>1 →</span> N containers</div>
+  <div class="rel">containers <span>1 →</span> N container_clients <span>(carga consolidada / LCL)</span></div>
+  <div class="rel">containers <span>1 →</span> N invoices <span>(una por cliente dentro del contenedor)</span></div>
+  <div class="rel">containers <span>1 →</span> N container_status_log <span>(historial completo de cambios)</span></div>
+</div>
+
+</body>
+</html>

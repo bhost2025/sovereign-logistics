@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero Operador — Sovereign Logistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; background: #f7fafc; color: #181c1e; min-height: 100vh; }
+
+  /* ── Topbar ── */
+  .topbar {
+    background: rgba(255,255,255,0.8); backdrop-filter: blur(20px);
+    padding: 14px 32px; display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 0 rgba(197,198,207,0.3);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo-mark { width: 30px; height: 30px; background: #0a1a3c; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .brand-name { font-size: 13px; font-weight: 800; color: #0a1a3c; letter-spacing: -0.02em; }
+  .divider { width: 1px; height: 18px; background: rgba(197,198,207,0.5); margin: 0 12px; }
+  .page-title { font-size: 13px; font-weight: 700; color: #3a4a5a; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .btn { font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+  .btn-ghost { background: transparent; border: 1px solid rgba(197,198,207,0.6); color: #6b7a8a; }
+  .btn-primary { background: #0a1a3c; color: #fff; border: none; }
+
+  /* ── Filters ── */
+  .filters {
+    padding: 12px 32px; background: #fff;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    box-shadow: 0 1px 0 rgba(197,198,207,0.2);
+  }
+  .search {
+    display: flex; align-items: center; gap: 8px;
+    background: #f7fafc; border: 1px solid rgba(197,198,207,0.5);
+    border-radius: 6px; padding: 6px 12px;
+    font-size: 11px; font-weight: 500; color: #8a9aaa;
+    min-width: 220px;
+  }
+  .chip { font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(197,198,207,0.5); color: #6b7a8a; background: transparent; }
+  .chip.active { background: #0a1a3c; color: #fff; border-color: #0a1a3c; }
+  .chip.crit { color: #C05A00; border-color: rgba(192,90,0,0.3); background: #fff5f0; }
+
+  /* ── Kanban ── */
+  .kanban { display: flex; gap: 16px; padding: 24px 32px; overflow-x: auto; align-items: flex-start; min-height: calc(100vh - 120px); }
+  .col { min-width: 210px; width: 210px; flex-shrink: 0; }
+
+  .col-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 0 10px 0; margin-bottom: 10px;
+    border-bottom: 2px solid;
+  }
+  .col-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #181c1e; }
+  .col-count { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; background: #f1f4f6; color: #3a4a5a; }
+
+  /* Column accent colors — deuteranopia safe */
+  .c-origen    .col-header { border-color: #556479; }
+  .c-zarpo     .col-header { border-color: #4A6FA5; }
+  .c-maritimo  .col-header { border-color: #3A5FA0; }
+  .c-eta       .col-header { border-color: #2A6FA8; }
+  .c-aduana    .col-header { border-color: #B8860B; }
+  .c-liberado  .col-header { border-color: #1A7A8A; }
+  .c-detenido  .col-header { border-color: #C05A00; }
+  .c-terrestre .col-header { border-color: #7A6A00; }
+  .c-entregado .col-header { border-color: #c5c6cf; opacity: 0.8; }
+
+  /* Cards */
+  .card {
+    background: #fff; border-radius: 8px;
+    padding: 14px; margin-bottom: 10px;
+    box-shadow: 0 1px 20px rgba(24,28,30,0.06);
+    cursor: pointer; transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .card:hover { box-shadow: 0 4px 30px rgba(24,28,30,0.1); transform: translateY(-1px); }
+  .card.crit { box-shadow: 0 1px 20px rgba(192,90,0,0.1); border-left: 3px solid #C05A00; padding-left: 11px; }
+  .card.dim  { opacity: 0.55; }
+
+  .card-number { font-size: 10px; font-weight: 800; color: #0a1a3c; letter-spacing: 0.04em; margin-bottom: 5px; font-family: 'Manrope', monospace; }
+  .card-client { font-size: 12px; font-weight: 700; color: #181c1e; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card-sub    { font-size: 10px; font-weight: 500; color: #8a9aaa; margin-bottom: 10px; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+
+  /* ETA tags */
+  .eta { font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; border-left: 2px solid; }
+  .eta-ok   { border-color: #1A7A8A; color: #1A7A8A; background: #f0fafa; }
+  .eta-warn { border-color: #B8860B; color: #B8860B; background: #fffbf0; }
+  .eta-crit { border-color: #C05A00; color: #C05A00; background: #fff5f0; }
+
+  /* LCL tag */
+  .lcl { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; color: #4A6FA5; background: #f0f4fb; border: 1px solid rgba(74,111,165,0.2); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Crit blink */
+  .crit-pulse { display: inline-block; animation: blink 1.6s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="logo-mark">🚢</div>
+    <span class="brand-name">Sovereign Logistics</span>
+    <div class="divider"></div>
+    <span class="page-title">Tablero de Contenedores</span>
+  </div>
+  <div class="top-right">
+    <span style="font-size:11px;font-weight:600;color:#8a9aaa;">Ana López · Operadora</span>
+    <button class="btn btn-ghost">Exportar</button>
+    <button class="btn btn-primary">+ Nuevo Contenedor</button>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="search">🔍 Buscar contenedor o cliente...</div>
+  <div class="chip active">Todos — 38</div>
+  <div class="chip">En Proceso — 21</div>
+  <div class="chip crit">▲ Detenidos — 3</div>
+  <div class="chip">✓ Entregados — 142</div>
+  <div class="chip">Programados — 12</div>
+  <div class="chip">LCL</div>
+</div>
+
+<div class="kanban">
+
+  <!-- Puerto Origen -->
+  <div class="col c-origen">
+    <div class="col-header"><span class="col-title">◇ Puerto Origen</span><span class="col-count">4</span></div>
+    <div class="card">
+      <div class="card-number">EISU9023456</div>
+      <div class="card-client">Muebles Guadalajara</div>
+      <div class="card-sub">Tianjin · Salida 18 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 29 Abr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">MSCU8872341</div>
+      <div class="card-client">3 clientes</div>
+      <div class="card-sub">Ningbo · Salida 20 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 02 May</span><span class="lcl">LCL</span></div>
+    </div>
+  </div>
+
+  <!-- Zarpó -->
+  <div class="col c-zarpo">
+    <div class="col-header"><span class="col-title">● Zarpó</span><span class="col-count">5</span></div>
+    <div class="card">
+      <div class="card-number">MSCU1234098</div>
+      <div class="card-client">2 clientes</div>
+      <div class="card-sub">Shenzhen · 12 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 02 May</span><span class="lcl">LCL</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">OOLU4412890</div>
+      <div class="card-client">Química Bajío SA</div>
+      <div class="card-sub">Guangzhou · 10 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 28 Abr</span></div>
+    </div>
+  </div>
+
+  <!-- Tránsito Marítimo -->
+  <div class="col c-maritimo">
+    <div class="col-header"><span class="col-title">● Tránsito Mar.</span><span class="col-count">8</span></div>
+    <div class="card">
+      <div class="card-number">MSCU7432110</div>
+      <div class="card-client">Textiles Monterrey</div>
+      <div class="card-sub">Shanghai → Manzanillo</div>
+      <div class="card-footer"><span class="eta eta-warn">ETA 18 Abr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">HLXU5512340</div>
+      <div class="card-client">Autopartes del Centro</div>
+      <div class="card-sub">Tianjin → Lázaro Cárdenas</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 25 Abr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">TEMU3349021</div>
+      <div class="card-client">Plásticos Noreste</div>
+      <div class="card-sub">Qingdao → Manzanillo</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA 30 Abr</span></div>
+    </div>
+  </div>
+
+  <!-- ETA Puerto Destino -->
+  <div class="col c-eta">
+    <div class="col-header"><span class="col-title">◆ ETA Destino</span><span class="col-count">3</span></div>
+    <div class="card">
+      <div class="card-number">APZU7712034</div>
+      <div class="card-client">Importadora Noreste</div>
+      <div class="card-sub">Llegada: mañana · Veracruz</div>
+      <div class="card-footer"><span class="eta eta-warn">Mañana</span></div>
+    </div>
+  </div>
+
+  <!-- En Aduana -->
+  <div class="col c-aduana">
+    <div class="col-header"><span class="col-title">◆ En Aduana</span><span class="col-count">4</span></div>
+    <div class="card">
+      <div class="card-number">CMAU4859021</div>
+      <div class="card-client">Electrónica del Norte</div>
+      <div class="card-sub">Manzanillo · 2 días</div>
+      <div class="card-footer"><span class="eta eta-warn">+2d sin update</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">APZU4120985</div>
+      <div class="card-client">Ferretería Nacional</div>
+      <div class="card-sub">Lázaro Cárdenas · 1 día</div>
+      <div class="card-footer"><span class="eta eta-ok">Normal</span></div>
+    </div>
+  </div>
+
+  <!-- Detenido ▲ -->
+  <div class="col c-detenido">
+    <div class="col-header"><span class="col-title"><span class="crit-pulse">▲</span> Detenido</span><span class="col-count" style="background:#fff5f0;color:#C05A00;">3</span></div>
+    <div class="card crit">
+      <div class="card-number">HLXU3012847</div>
+      <div class="card-client">3 clientes — LCL</div>
+      <div class="card-sub">Manzanillo · 4 días</div>
+      <div class="card-footer"><span class="eta eta-crit">▲ Urgente 4d</span><span class="lcl">LCL</span></div>
+    </div>
+    <div class="card crit">
+      <div class="card-number">SUDU7219034</div>
+      <div class="card-client">Confecciones CDMX</div>
+      <div class="card-sub">Veracruz · 2 días</div>
+      <div class="card-footer"><span class="eta eta-crit">▲ Revisar 2d</span></div>
+    </div>
+  </div>
+
+  <!-- Liberado ✓ -->
+  <div class="col c-liberado">
+    <div class="col-header"><span class="col-title">✓ Liberado</span><span class="col-count">3</span></div>
+    <div class="card">
+      <div class="card-number">GESU4499012</div>
+      <div class="card-client">Importaciones CDMX</div>
+      <div class="card-sub">Liberado: 13 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">✓ Libre</span></div>
+    </div>
+  </div>
+
+  <!-- Tránsito Terrestre -->
+  <div class="col c-terrestre">
+    <div class="col-header"><span class="col-title">◆ T. Terrestre</span><span class="col-count">4</span></div>
+    <div class="card">
+      <div class="card-number">TCNU6784512</div>
+      <div class="card-client">Importadora Bajío</div>
+      <div class="card-sub">Manzanillo → Guadalajara</div>
+      <div class="card-footer"><span class="eta eta-warn">ETA: 15 Abr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-number">BMOU3312098</div>
+      <div class="card-client">Tecnología Occidente</div>
+      <div class="card-sub">Veracruz → CDMX</div>
+      <div class="card-footer"><span class="eta eta-ok">ETA: 16 Abr</span></div>
+    </div>
+  </div>
+
+  <!-- Entregado -->
+  <div class="col c-entregado">
+    <div class="col-header"><span class="col-title">✓ Entregado</span><span class="col-count">142</span></div>
+    <div class="card dim">
+      <div class="card-number">MSCU0099234</div>
+      <div class="card-client">Calzado León SA</div>
+      <div class="card-sub">Entregado: 10 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">✓ Entregado</span></div>
+    </div>
+    <div class="card dim">
+      <div class="card-number">OOLU3312456</div>
+      <div class="card-client">Plásticos Noreste</div>
+      <div class="card-sub">Entregado: 08 Abr</div>
+      <div class="card-footer"><span class="eta eta-ok">✓ Entregado</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Móvil Operador — Sovereign Logistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: #ebeef0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 375px;
+    background: #f7fafc;
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(24,28,30,0.18), 0 0 0 10px #181c1e, 0 0 0 12px #3a4a5a;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Notch */
+  .notch {
+    background: #181c1e;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .notch-pill { width: 100px; height: 10px; background: #0a0a0a; border-radius: 10px; }
+
+  /* Status bar */
+  .status-bar {
+    background: #fff;
+    padding: 8px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #181c1e;
+  }
+
+  /* Screen label */
+  .screen-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8a9aaa;
+    margin-bottom: 12px;
+  }
+
+  /* ── SCREEN 1: Lista de contenedores ── */
+  .s1-topbar {
+    background: #fff;
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 0 rgba(197,198,207,0.3);
+  }
+  .s1-title { font-size: 18px; font-weight: 800; color: #0a1a3c; letter-spacing: -0.02em; }
+  .s1-avatar { width: 32px; height: 32px; border-radius: 50%; background: #0a1a3c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+
+  .search-bar {
+    margin: 14px 20px;
+    background: #f1f4f6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #8a9aaa; font-weight: 500;
+  }
+
+  .filter-row { padding: 0 20px 14px; display: flex; gap: 8px; overflow-x: auto; }
+  .filter-pill { font-size: 10px; font-weight: 700; padding: 5px 12px; border-radius: 20px; white-space: nowrap; }
+  .fp-active { background: #0a1a3c; color: #fff; }
+  .fp-default { background: #fff; color: #6b7a8a; border: 1px solid rgba(197,198,207,0.5); }
+  .fp-crit { background: #fff5f0; color: #C05A00; border: 1px solid rgba(192,90,0,0.3); }
+
+  .list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+  .list-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 12px rgba(24,28,30,0.06);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .list-card.urgent { border-left: 3px solid #C05A00; padding-left: 11px; }
+  .list-accent { width: 4px; border-radius: 2px; align-self: stretch; flex-shrink: 0; }
+  .list-info { flex: 1; min-width: 0; }
+  .list-number { font-size: 11px; font-weight: 800; color: #0a1a3c; letter-spacing: 0.04em; }
+  .list-client { font-size: 13px; font-weight: 700; color: #181c1e; margin: 2px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .list-sub { font-size: 10px; font-weight: 500; color: #8a9aaa; }
+  .list-badge {
+    font-size: 9px; font-weight: 700; padding: 3px 8px;
+    border-radius: 4px; text-transform: uppercase;
+    letter-spacing: 0.04em; white-space: nowrap;
+    border-left: 2px solid;
+  }
+  .lb-transit   { border-color: #4A6FA5; color: #4A6FA5; background: #f0f4fb; }
+  .lb-aduana    { border-color: #B8860B; color: #B8860B; background: #fffbf0; }
+  .lb-detenido  { border-color: #C05A00; color: #C05A00; background: #fff5f0; }
+  .lb-liberado  { border-color: #1A7A8A; color: #1A7A8A; background: #f0fafa; }
+
+  .fab {
+    margin: 16px;
+    background: #0a1a3c;
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── SCREEN 2: Actualizar estado ── */
+  .s2-header {
+    background: #0a1a3c;
+    padding: 16px 20px 20px;
+  }
+  .s2-back { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 10px; }
+  .s2-title { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+  .s2-num { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 600; margin-top: 2px; font-family: monospace; }
+
+  .s2-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; background: #f7fafc; }
+
+  /* Current status */
+  .current-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 12px rgba(24,28,30,0.06);
+  }
+  .cc-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; margin-bottom: 8px; }
+  .cc-status { display: flex; align-items: center; gap: 10px; }
+  .cc-bar { width: 3px; height: 32px; border-radius: 2px; background: #B8860B; }
+  .cc-text { font-size: 14px; font-weight: 700; color: #181c1e; }
+  .cc-days { font-size: 11px; color: #8a9aaa; font-weight: 500; margin-top: 2px; }
+
+  /* Select new status */
+  .section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; margin-bottom: 8px; }
+  .status-options { display: flex; flex-direction: column; gap: 8px; }
+  .status-option {
+    background: #fff;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 8px rgba(24,28,30,0.05);
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .status-option.selected { border-color: #0a1a3c; }
+  .so-bar { width: 3px; height: 24px; border-radius: 2px; flex-shrink: 0; }
+  .so-name { font-size: 12px; font-weight: 700; color: #181c1e; }
+  .so-check { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; border: 2px solid #c5c6cf; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .so-check.checked { background: #0a1a3c; border-color: #0a1a3c; color: #fff; }
+
+  .notes-input {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 8px rgba(24,28,30,0.05);
+  }
+  .ni-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; margin-bottom: 6px; }
+  .ni-field { font-size: 12px; color: #8a9aaa; font-weight: 500; }
+
+  .cta-btn {
+    background: #0a1a3c;
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+  }
+  .cta-btn.disabled { background: #ebeef0; color: #8a9aaa; }
+
+  .home-bar {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    background: #f7fafc;
+  }
+  .home-pill { width: 100px; height: 4px; background: #181c1e; border-radius: 4px; opacity: 0.2; }
+</style>
+</head>
+<body>
+
+<!-- PHONE 1: Lista -->
+<div>
+  <div class="screen-label">Pantalla 1 — Lista de contenedores</div>
+  <div class="phone">
+    <div class="notch"><div class="notch-pill"></div></div>
+    <div class="status-bar"><span>9:41</span><span>●●● 5G ▌</span></div>
+
+    <div class="s1-topbar">
+      <div class="s1-title">Mis Contenedores</div>
+      <div class="s1-avatar">AL</div>
+    </div>
+
+    <div class="search-bar">🔍 Buscar número o cliente...</div>
+
+    <div class="filter-row">
+      <div class="filter-pill fp-active">Todos (38)</div>
+      <div class="filter-pill fp-crit">▲ Detenidos (3)</div>
+      <div class="filter-pill fp-default">En Proceso</div>
+      <div class="filter-pill fp-default">LCL</div>
+    </div>
+
+    <div class="list">
+      <div class="list-card urgent">
+        <div class="list-accent" style="background:#C05A00"></div>
+        <div class="list-info">
+          <div class="list-number">HLXU3012847</div>
+          <div class="list-client">3 clientes — LCL</div>
+          <div class="list-sub">Manzanillo · 4 días detenido</div>
+        </div>
+        <div class="list-badge lb-detenido">▲ Detenido</div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-accent" style="background:#B8860B"></div>
+        <div class="list-info">
+          <div class="list-number">CMAU4859021</div>
+          <div class="list-client">Electrónica del Norte</div>
+          <div class="list-sub">Manzanillo · 2 días en aduana</div>
+        </div>
+        <div class="list-badge lb-aduana">◆ Aduana</div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-accent" style="background:#4A6FA5"></div>
+        <div class="list-info">
+          <div class="list-number">MSCU7432110</div>
+          <div class="list-client">Textiles Monterrey</div>
+          <div class="list-sub">Shanghai → Manzanillo · ETA 18 Abr</div>
+        </div>
+        <div class="list-badge lb-transit">● Tránsito</div>
+      </div>
+
+      <div class="list-card">
+        <div class="list-accent" style="background:#1A7A8A"></div>
+        <div class="list-info">
+          <div class="list-number">GESU4499012</div>
+          <div class="list-client">Importaciones CDMX</div>
+          <div class="list-sub">Liberado: 13 Abr · Manzanillo</div>
+        </div>
+        <div class="list-badge lb-liberado">✓ Liberado</div>
+      </div>
+    </div>
+
+    <div class="fab">+ Registrar nuevo contenedor</div>
+
+    <div class="home-bar"><div class="home-pill"></div></div>
+  </div>
+</div>
+
+<!-- PHONE 2: Actualizar estado -->
+<div>
+  <div class="screen-label">Pantalla 2 — Actualizar estado</div>
+  <div class="phone">
+    <div class="notch"><div class="notch-pill"></div></div>
+    <div class="status-bar" style="background:#0a1a3c;color:#fff;"><span>9:41</span><span>●●● 5G ▌</span></div>
+
+    <div class="s2-header">
+      <div class="s2-back">← Contenedores</div>
+      <div class="s2-title">Actualizar Estado</div>
+      <div class="s2-num">CMAU4859021 · Electrónica del Norte</div>
+    </div>
+
+    <div class="s2-body">
+
+      <!-- Estado actual -->
+      <div>
+        <div class="section-label">Estado actual</div>
+        <div class="current-card">
+          <div class="cc-status">
+            <div class="cc-bar"></div>
+            <div>
+              <div class="cc-text">◆ En Aduana</div>
+              <div class="cc-days">Manzanillo · 2 días en este estado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nuevo estado -->
+      <div>
+        <div class="section-label">Cambiar a</div>
+        <div class="status-options">
+          <div class="status-option">
+            <div class="so-bar" style="background:#1A7A8A"></div>
+            <span class="so-name">✓ Liberado de Aduana</span>
+            <div class="so-check">✓</div>
+          </div>
+          <div class="status-option selected">
+            <div class="so-bar" style="background:#C05A00"></div>
+            <span class="so-name">▲ Detenido en Aduana</span>
+            <div class="so-check checked">✓</div>
+          </div>
+          <div class="status-option">
+            <div class="so-bar" style="background:#7A6A00"></div>
+            <span class="so-name">◆ Tránsito Terrestre</span>
+            <div class="so-check"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas -->
+      <div>
+        <div class="notes-input">
+          <div class="ni-label">Notas (opcional)</div>
+          <div class="ni-field">Ej. Documentación incompleta...</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-btn">Confirmar cambio de estado</div>
+
+    </div>
+
+    <div class="home-bar"><div class="home-pill"></div></div>
+  </div>
+</div>
+
+</body>
+</html>

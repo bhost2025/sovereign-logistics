@@ -1,0 +1,226 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: Sovereign Logistics
+      - generic [ref=e6]:
+        - img "System Operator" [ref=e7]
+        - generic [ref=e8]:
+          - generic [ref=e9]: Control Center
+          - generic [ref=e10]: Terminal Alpha-7
+    - navigation [ref=e11]:
+      - link "dashboard Overview" [ref=e12] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e13]: dashboard
+        - generic [ref=e14]: Overview
+      - link "conveyor_belt Fleet Status" [ref=e15] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e16]: conveyor_belt
+        - generic [ref=e17]: Fleet Status
+      - link "local_shipping Active Loads" [ref=e18] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e19]: local_shipping
+        - generic [ref=e20]: Active Loads
+      - link "history_edu Audit Logs" [ref=e21] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e22]: history_edu
+        - generic [ref=e23]: Audit Logs
+      - link "verified Compliance" [ref=e24] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e25]: verified
+        - generic [ref=e26]: Compliance
+      - link "contact_page Directory" [ref=e27] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e28]: contact_page
+        - generic [ref=e29]: Directory
+    - generic [ref=e30]:
+      - button "add New Manifest" [ref=e31] [cursor=pointer]:
+        - generic [ref=e32]: add
+        - text: New Manifest
+      - link "help Support" [ref=e33] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e34]: help
+        - generic [ref=e35]: Support
+      - link "logout Sign Out" [ref=e36] [cursor=pointer]:
+        - /url: "#"
+        - generic [ref=e37]: logout
+        - generic [ref=e38]: Sign Out
+  - main [ref=e39]:
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - heading "Director Dashboard" [level=1] [ref=e43]
+        - navigation [ref=e44]:
+          - link "Dashboard" [ref=e45] [cursor=pointer]:
+            - /url: "#"
+          - link "Inventory" [ref=e46] [cursor=pointer]:
+            - /url: "#"
+          - link "Shipments" [ref=e47] [cursor=pointer]:
+            - /url: "#"
+          - link "Reports" [ref=e48] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]: search
+          - textbox "Search operations..." [ref=e52]
+        - button "notifications" [ref=e53] [cursor=pointer]:
+          - generic [ref=e54]: notifications
+        - button "Create Order" [ref=e55] [cursor=pointer]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]: Active Containers
+              - generic [ref=e62]: package_2
+            - heading "1,248" [level=2] [ref=e63]
+          - generic [ref=e64]:
+            - generic [ref=e65]: trending_up
+            - text: +12% vs last month
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]: Held in Customs
+              - generic [ref=e70]: gavel
+            - heading "14" [level=2] [ref=e71]
+          - generic [ref=e72]:
+            - generic [ref=e73]: warning
+            - text: Requires Attention
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]: Delivered (24h)
+              - generic [ref=e78]: task_alt
+            - heading "382" [level=2] [ref=e79]
+          - generic [ref=e80]:
+            - generic [ref=e81]: schedule
+            - text: On schedule
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - heading "Global Shipments" [level=3] [ref=e85]
+          - generic [ref=e86]:
+            - button "filter_list Filters" [ref=e87] [cursor=pointer]:
+              - generic [ref=e88]: filter_list
+              - text: Filters
+            - button "download Export" [ref=e89] [cursor=pointer]:
+              - generic [ref=e90]: download
+              - text: Export
+        - table [ref=e92]:
+          - rowgroup [ref=e93]:
+            - 'row "Container # Client ETA Status" [ref=e94]':
+              - 'columnheader "Container #" [ref=e95]'
+              - columnheader "Client" [ref=e96]
+              - columnheader "ETA" [ref=e97]
+              - columnheader "Status" [ref=e98]
+              - columnheader [ref=e99]
+          - rowgroup [ref=e100]:
+            - row "CNTR-99281-X MSC AURORA | VOY 204 L'Oréal Paris S.A. Oct 24, 2023 14:20 GMT directions_boat In Transit more_vert" [ref=e101]:
+              - cell "CNTR-99281-X MSC AURORA | VOY 204" [ref=e102]:
+                - generic [ref=e103]: CNTR-99281-X
+                - generic [ref=e104]: MSC AURORA | VOY 204
+              - cell "L'Oréal Paris S.A." [ref=e105]:
+                - generic [ref=e106]: L'Oréal Paris S.A.
+              - cell "Oct 24, 2023 14:20 GMT" [ref=e107]:
+                - generic [ref=e108]: Oct 24, 2023
+                - generic [ref=e109]: 14:20 GMT
+              - cell "directions_boat In Transit" [ref=e110]:
+                - generic [ref=e111]:
+                  - generic [ref=e112]: directions_boat
+                  - generic [ref=e113]: In Transit
+              - cell "more_vert" [ref=e114]:
+                - button "more_vert" [ref=e115] [cursor=pointer]:
+                  - generic [ref=e116]: more_vert
+            - row "CNTR-44512-L EVER GIVEN | VOY 112 TechLogistics HK Oct 21, 2023 Delayed +2d gavel Held more_vert" [ref=e117]:
+              - cell "CNTR-44512-L EVER GIVEN | VOY 112" [ref=e118]:
+                - generic [ref=e119]: CNTR-44512-L
+                - generic [ref=e120]: EVER GIVEN | VOY 112
+              - cell "TechLogistics HK" [ref=e121]:
+                - generic [ref=e122]: TechLogistics HK
+              - cell "Oct 21, 2023 Delayed +2d" [ref=e123]:
+                - generic [ref=e124]: Oct 21, 2023
+                - generic [ref=e125]: Delayed +2d
+              - cell "gavel Held" [ref=e126]:
+                - generic [ref=e127]:
+                  - generic [ref=e128]: gavel
+                  - generic [ref=e129]: Held
+              - cell "more_vert" [ref=e130]:
+                - button "more_vert" [ref=e131] [cursor=pointer]:
+                  - generic [ref=e132]: more_vert
+            - row "CNTR-10293-K MAERSK LINE | VOY 88 BMW Group Oct 20, 2023 Completed task_alt Delivered more_vert" [ref=e133]:
+              - cell "CNTR-10293-K MAERSK LINE | VOY 88" [ref=e134]:
+                - generic [ref=e135]: CNTR-10293-K
+                - generic [ref=e136]: MAERSK LINE | VOY 88
+              - cell "BMW Group" [ref=e137]:
+                - generic [ref=e138]: BMW Group
+              - cell "Oct 20, 2023 Completed" [ref=e139]:
+                - generic [ref=e140]: Oct 20, 2023
+                - generic [ref=e141]: Completed
+              - cell "task_alt Delivered" [ref=e142]:
+                - generic [ref=e143]:
+                  - generic [ref=e144]: task_alt
+                  - generic [ref=e145]: Delivered
+              - cell "more_vert" [ref=e146]:
+                - button "more_vert" [ref=e147] [cursor=pointer]:
+                  - generic [ref=e148]: more_vert
+            - row "CNTR-88211-M HAPAG-LLOYD | VOY 452 Zara Int. Oct 26, 2023 On Time directions_boat In Transit more_vert" [ref=e149]:
+              - cell "CNTR-88211-M HAPAG-LLOYD | VOY 452" [ref=e150]:
+                - generic [ref=e151]: CNTR-88211-M
+                - generic [ref=e152]: HAPAG-LLOYD | VOY 452
+              - cell "Zara Int." [ref=e153]:
+                - generic [ref=e154]: Zara Int.
+              - cell "Oct 26, 2023 On Time" [ref=e155]:
+                - generic [ref=e156]: Oct 26, 2023
+                - generic [ref=e157]: On Time
+              - cell "directions_boat In Transit" [ref=e158]:
+                - generic [ref=e159]:
+                  - generic [ref=e160]: directions_boat
+                  - generic [ref=e161]: In Transit
+              - cell "more_vert" [ref=e162]:
+                - button "more_vert" [ref=e163] [cursor=pointer]:
+                  - generic [ref=e164]: more_vert
+        - generic [ref=e165]:
+          - generic [ref=e166]: Showing 4 of 1,248 containers
+          - generic [ref=e167]:
+            - button "chevron_left" [ref=e168] [cursor=pointer]:
+              - generic [ref=e169]: chevron_left
+            - button "1" [ref=e170] [cursor=pointer]
+            - button "2" [ref=e171] [cursor=pointer]
+            - button "chevron_right" [ref=e172] [cursor=pointer]:
+              - generic [ref=e173]: chevron_right
+      - complementary [ref=e174]:
+        - generic [ref=e175]:
+          - generic [ref=e176]:
+            - heading "System Alerts" [level=4] [ref=e177]
+            - generic [ref=e178]: notifications_active
+          - generic [ref=e179]:
+            - generic [ref=e182]:
+              - generic [ref=e183]: Port Congestion
+              - generic [ref=e184]: Rotterdam (NL) Reporting 48h delays
+              - generic [ref=e185]: 12 mins ago • Terminal Alpha
+            - generic [ref=e188]:
+              - generic [ref=e189]: Manifest Update
+              - generic [ref=e190]: "New customs clearance for Order #882"
+              - generic [ref=e191]: 1 hour ago • System Automator
+        - generic [ref=e192]:
+          - heading "Activity Log history" [level=4] [ref=e193]:
+            - text: Activity Log
+            - generic [ref=e194]: history
+          - list [ref=e195]:
+            - listitem [ref=e196]:
+              - generic [ref=e199]: person
+              - generic [ref=e200]:
+                - paragraph [ref=e201]: Director **E. Vance** approved manifest **CNTR-092**
+                - text: 14:02 PM
+            - listitem [ref=e202]:
+              - generic [ref=e205]: inventory
+              - generic [ref=e206]:
+                - paragraph [ref=e207]: Warehouse **Delta-3** scanned 42 high-value pallets
+                - text: 13:45 PM
+            - listitem [ref=e208]:
+              - generic [ref=e210]: priority_high
+              - generic [ref=e211]:
+                - paragraph [ref=e212]: Customs flag raised for container **L-445**
+                - text: 11:20 AM
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - generic [ref=e216]: Weekly Efficiency
+            - generic [ref=e217]: 94.8%
+          - generic [ref=e218]: show_chart

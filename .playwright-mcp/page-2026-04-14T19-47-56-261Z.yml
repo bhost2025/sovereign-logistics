@@ -1,0 +1,94 @@
+- generic [active] [ref=e1]:
+  - heading "Arquitectura del Sistema" [level=1] [ref=e2]
+  - paragraph [ref=e3]: "Container Tracking SaaS — China → México · Stack: Supabase + Next.js + Expo"
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: Clientes / Usuarios
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - text: Super Admin
+          - generic [ref=e9]: Configuración del sistema
+          - generic [ref=e10]: MVP
+        - generic [ref=e11]:
+          - text: Operador Logístico
+          - generic [ref=e12]: CRUD contenedores · Carga de facturas
+          - generic [ref=e13]: MVP
+        - generic [ref=e14]:
+          - text: Director Principal
+          - generic [ref=e15]: Dashboard read-only
+          - generic [ref=e16]: MVP
+        - generic [ref=e17]:
+          - text: Cliente Final
+          - generic [ref=e18]: Portal de seguimiento propio
+          - generic [ref=e19]: Fase 2
+    - generic [ref=e20]: Acceso vía Web + App Móvil
+    - generic [ref=e21]:
+      - generic [ref=e22]: Frontend
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: Next.js 14 (Web)
+          - generic [ref=e25]: App Router · Tailwind CSS · shadcn/ui
+          - generic [ref=e26]: MVP
+        - generic [ref=e27]:
+          - text: React Native (Expo)
+          - generic [ref=e28]: iOS + Android · Shared types con Web
+          - generic [ref=e29]: MVP
+    - generic [ref=e30]: HTTPS · REST / Supabase Client SDK
+    - generic [ref=e31]:
+      - generic [ref=e32]: Backend / API
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - text: Next.js API Routes
+          - generic [ref=e35]: Lógica de negocio · Validación · Controladores
+          - generic [ref=e36]: MVP
+        - generic [ref=e37]:
+          - text: Supabase Auth
+          - generic [ref=e38]: JWT · RBAC · Sesiones
+          - generic [ref=e39]: MVP
+        - generic [ref=e40]:
+          - text: Supabase Edge Functions
+          - generic [ref=e41]: Notificaciones email · Webhooks
+          - generic [ref=e42]: Fase 2
+    - generic [ref=e43]: Supabase Client · Row Level Security
+    - generic [ref=e44]:
+      - generic [ref=e45]: Datos
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - text: PostgreSQL (Supabase)
+          - generic [ref=e48]: Contenedores · Clientes · Facturas · Estados · Roles
+          - generic [ref=e49]: MVP
+        - generic [ref=e50]:
+          - text: Supabase Storage
+          - generic [ref=e51]: PDFs de facturas · Packing Lists
+          - generic [ref=e52]: MVP
+        - generic [ref=e53]:
+          - text: Supabase Realtime
+          - generic [ref=e54]: Cambios de estado en tiempo real
+          - generic [ref=e55]: Fase 2
+    - generic [ref=e56]: Integraciones Externas
+    - generic [ref=e57]:
+      - generic [ref=e58]: Integraciones Externas
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - text: Resend / SendGrid
+          - generic [ref=e61]: Notificaciones email
+          - generic [ref=e62]: Fase 2
+        - generic [ref=e63]:
+          - text: WhatsApp (Twilio/Meta)
+          - generic [ref=e64]: Alertas omnicanal
+          - generic [ref=e65]: Fase 2
+        - generic [ref=e66]:
+          - text: Project44 / APIs Navieras
+          - generic [ref=e67]: Tracking automático por B/L
+          - generic [ref=e68]: Fase 2
+        - generic [ref=e69]:
+          - text: OCR IA
+          - generic [ref=e70]: Extracción de facturas PDF
+          - generic [ref=e71]: Fase 2
+  - generic [ref=e72]:
+    - strong [ref=e73]: "Puntos clave de diseño:"
+    - list [ref=e74]:
+      - listitem [ref=e75]: Multi-tenant desde el día 1 — Row Level Security en Supabase garantiza aislamiento de datos por empresa.
+      - listitem [ref=e76]: Un contenedor puede tener productos de múltiples clientes finales (carga consolidada LCL). El modelo de datos lo soporta nativamente.
+      - listitem [ref=e77]: Next.js y Expo comparten tipos TypeScript — una sola fuente de verdad para los modelos de datos.
+      - listitem [ref=e78]: Todo marcado como "Fase 2" está contemplado en el esquema de BD desde el MVP para no romper la arquitectura al escalar.

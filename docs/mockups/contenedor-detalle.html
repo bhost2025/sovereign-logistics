@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle Contenedor — Sovereign Logistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: #f7fafc;
+    color: #181c1e;
+    min-height: 100vh;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(24px);
+    padding: 14px 36px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 1px 0 rgba(197,198,207,0.3);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .top-left { display: flex; align-items: center; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .logo-mark { width: 28px; height: 28px; background: #0a1a3c; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .brand-name { font-size: 13px; font-weight: 800; color: #0a1a3c; letter-spacing: -0.02em; }
+  .sep { color: rgba(197,198,207,0.8); font-size: 16px; }
+  .breadcrumb { font-size: 12px; font-weight: 600; color: #8a9aaa; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb .current { color: #181c1e; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .btn { font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+  .btn-ghost { background: transparent; border: 1px solid rgba(197,198,207,0.6); color: #6b7a8a; }
+  .btn-primary { background: #0a1a3c; color: #fff; border: none; }
+  .btn-warn { background: #fff5f0; color: #C05A00; border: 1px solid rgba(192,90,0,0.3); }
+
+  /* ── Layout ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 36px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* ── Header card ── */
+  .header-card {
+    background: #0a1a3c;
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+  }
+  .container-num { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.02em; font-family: 'Manrope', monospace; }
+  .container-meta { display: flex; align-items: center; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .meta-chip { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 5px; }
+  .meta-chip strong { color: rgba(255,255,255,0.9); }
+  .meta-sep { color: rgba(255,255,255,0.2); }
+
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .status-hero {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+    border-left: 3px solid;
+    background: rgba(255,255,255,0.07);
+  }
+  .sh-aduana { border-color: #F59E0B; color: #FCD34D; }
+  .sh-detenido { border-color: #F97316; color: #FDB87A; }
+
+  .contratiempo-banner {
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.35);
+    border-radius: 8px;
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    max-width: 320px;
+  }
+  .ct-icon { font-size: 16px; flex-shrink: 0; }
+  .ct-title { font-size: 11px; font-weight: 800; color: #FDB87A; }
+  .ct-desc { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  .eta-block { text-align: right; }
+  .eta-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); }
+  .eta-date { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.02em; margin-top: 4px; }
+  .eta-delta { font-size: 11px; font-weight: 600; color: #F59E0B; margin-top: 2px; }
+
+  /* ── Timeline ── */
+  .timeline-card { background: #fff; border-radius: 12px; padding: 28px 32px; box-shadow: 0 2px 40px rgba(24,28,30,0.06); }
+  .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; margin-bottom: 24px; }
+
+  .timeline { display: flex; align-items: flex-start; gap: 0; position: relative; }
+  .tl-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+  .tl-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: #ebeef0;
+    z-index: 0;
+  }
+  .tl-step.done:not(:last-child)::after { background: #4A6FA5; }
+  .tl-step.current:not(:last-child)::after { background: linear-gradient(90deg, #B8860B 0%, #ebeef0 100%); }
+
+  .tl-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    position: relative; z-index: 1;
+    flex-shrink: 0;
+    border: 2px solid;
+  }
+  .tl-dot.done    { background: #4A6FA5; border-color: #4A6FA5; color: #fff; }
+  .tl-dot.current { background: #fff; border-color: #B8860B; color: #B8860B; box-shadow: 0 0 0 4px rgba(184,134,11,0.15); }
+  .tl-dot.pending { background: #fff; border-color: #c5c6cf; color: #c5c6cf; }
+  .tl-dot.alert   { background: #fff5f0; border-color: #C05A00; color: #C05A00; box-shadow: 0 0 0 4px rgba(192,90,0,0.12); }
+
+  .tl-label { font-size: 9px; font-weight: 700; text-align: center; margin-top: 8px; line-height: 1.3; max-width: 72px; }
+  .tl-label.done    { color: #4A6FA5; }
+  .tl-label.current { color: #B8860B; }
+  .tl-label.pending { color: #c5c6cf; }
+  .tl-label.alert   { color: #C05A00; }
+  .tl-date { font-size: 9px; font-weight: 500; color: #8a9aaa; margin-top: 3px; text-align: center; }
+
+  /* ── Two-col ── */
+  .two-col { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 380px; gap: 24px; align-items: start; }
+
+  /* ── Info cards ── */
+  .info-card { background: #fff; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 40px rgba(24,28,30,0.06); }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+  .info-field {}
+  .if-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; margin-bottom: 5px; }
+  .if-value { font-size: 13px; font-weight: 700; color: #181c1e; }
+  .if-value.mono { font-family: 'Manrope', monospace; font-size: 12px; color: #0a1a3c; }
+
+  /* ── Contratiempo card ── */
+  .ct-card {
+    background: #fff5f0;
+    border: 1px solid rgba(192,90,0,0.2);
+    border-left: 4px solid #C05A00;
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .ct-card-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #C05A00; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .ct-fields { display: flex; flex-direction: column; gap: 10px; }
+  .ct-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .ct-key { font-size: 10px; font-weight: 600; color: #8a9aaa; }
+  .ct-val { font-size: 12px; font-weight: 700; color: #181c1e; text-align: right; }
+  .ct-val.warn { color: #C05A00; }
+  .ct-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(192,90,0,0.15); font-size: 11px; font-weight: 500; color: #6b7a8a; line-height: 1.6; }
+
+  /* ── Inventory table ── */
+  .inv-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 40px rgba(24,28,30,0.06); overflow: hidden; }
+  .inv-header { padding: 20px 28px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .inv-meta { font-size: 11px; font-weight: 600; color: #8a9aaa; }
+  .inv-meta strong { color: #181c1e; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 20px; text-align: left;
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #8a9aaa;
+    background: #f7fafc;
+    border-bottom: 1px solid rgba(197,198,207,0.2);
+  }
+  tbody td { padding: 13px 20px; font-size: 12px; font-weight: 500; color: #3a4a5a; }
+  tbody tr { border-bottom: 1px solid rgba(197,198,207,0.12); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover td { background: #f7fafc; }
+
+  .client-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; padding: 3px 10px;
+    border-radius: 4px; background: #f0f4fb;
+    color: #4A6FA5; border-left: 2px solid #4A6FA5;
+  }
+  .qty-badge { font-size: 11px; font-weight: 800; color: #0a1a3c; }
+  .value-cell { font-size: 12px; font-weight: 700; color: #181c1e; font-family: 'Manrope', monospace; }
+  .inv-total { padding: 14px 20px; background: #f7fafc; display: flex; justify-content: flex-end; gap: 32px; border-top: 1px solid rgba(197,198,207,0.2); }
+  .total-item { font-size: 11px; font-weight: 700; color: #8a9aaa; }
+  .total-item strong { font-size: 14px; font-weight: 800; color: #0a1a3c; }
+
+  /* ── Messages / Helpdesk ── */
+  .msgs-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 40px rgba(24,28,30,0.06); display: flex; flex-direction: column; overflow: hidden; }
+  .msgs-header { padding: 20px 24px 14px; border-bottom: 1px solid rgba(197,198,207,0.15); display: flex; align-items: center; justify-content: space-between; }
+  .msgs-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #8a9aaa; }
+  .unread-badge { font-size: 9px; font-weight: 800; background: #C05A00; color: #fff; padding: 2px 8px; border-radius: 20px; }
+
+  .msgs-list { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; }
+
+  .msg { display: flex; flex-direction: column; gap: 4px; max-width: 88%; }
+  .msg.incoming { align-self: flex-start; }
+  .msg.outgoing { align-self: flex-end; }
+
+  .msg-sender { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8a9aaa; padding: 0 4px; }
+  .msg.outgoing .msg-sender { text-align: right; }
+
+  .msg-bubble {
+    padding: 10px 14px; border-radius: 10px;
+    font-size: 12px; font-weight: 500; line-height: 1.5;
+  }
+  .msg.incoming .msg-bubble { background: #f1f4f6; color: #181c1e; border-radius: 2px 10px 10px 10px; }
+  .msg.outgoing .msg-bubble { background: #0a1a3c; color: #fff; border-radius: 10px 2px 10px 10px; }
+  .msg.system .msg-bubble  { background: #fff5f0; color: #C05A00; border: 1px solid rgba(192,90,0,0.2); border-radius: 8px; font-size: 11px; align-self: center; max-width: 100%; text-align: center; }
+  .msg.system { max-width: 100%; align-self: center; }
+
+  .msg-time { font-size: 9px; font-weight: 500; color: #c5c6cf; padding: 0 4px; }
+  .msg.outgoing .msg-time { text-align: right; }
+
+  .msgs-input { padding: 14px 16px; border-top: 1px solid rgba(197,198,207,0.15); display: flex; gap: 10px; align-items: flex-end; }
+  .input-box {
+    flex: 1; background: #f1f4f6; border: none; border-radius: 8px;
+    padding: 10px 14px; font-family: 'Manrope', sans-serif;
+    font-size: 12px; font-weight: 500; color: #181c1e;
+    resize: none; outline: none; line-height: 1.4;
+    min-height: 40px;
+  }
+  .input-box::placeholder { color: #8a9aaa; }
+  .send-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: #0a1a3c; color: #fff; border: none;
+    font-size: 14px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Historial de estados ── */
+  .log-list { display: flex; flex-direction: column; gap: 0; }
+  .log-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid rgba(197,198,207,0.12); }
+  .log-item:last-child { border-bottom: none; }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .log-content { flex: 1; }
+  .log-status { font-size: 12px; font-weight: 700; color: #181c1e; }
+  .log-meta { font-size: 10px; font-weight: 500; color: #8a9aaa; margin-top: 2px; }
+  .log-note { font-size: 11px; font-weight: 500; color: #6b7a8a; margin-top: 4px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="top-left">
+    <div class="brand">
+      <div class="logo-mark">🚢</div>
+      <span class="brand-name">Sovereign Logistics</span>
+    </div>
+    <span class="sep">/</span>
+    <div class="breadcrumb">
+      <span>Tablero</span>
+      <span class="sep">/</span>
+      <span>Contenedores</span>
+      <span class="sep">/</span>
+      <span class="current">HLXU3012847</span>
+    </div>
+  </div>
+  <div class="top-right">
+    <button class="btn btn-ghost">Historial completo</button>
+    <button class="btn btn-warn">▲ Escalar a Dirección</button>
+    <button class="btn btn-primary">Cambiar estado</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Header card -->
+  <div class="header-card">
+    <div>
+      <div class="container-num">HLXU3012847</div>
+      <div class="container-meta">
+        <div class="meta-chip">B/L <strong>MSCUSHA123456</strong></div>
+        <span class="meta-sep">·</span>
+        <div class="meta-chip">Origen <strong>Ningbo, China</strong></div>
+        <span class="meta-sep">·</span>
+        <div class="meta-chip">Destino <strong>Manzanillo, México</strong></div>
+        <span class="meta-sep">·</span>
+        <div class="meta-chip">Naviera <strong>MSC</strong></div>
+        <span class="meta-sep">·</span>
+        <div class="meta-chip">Carga <strong>LCL — 3 clientes</strong></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-hero sh-aduana">◆ Detenido en Aduana</div>
+      <div class="contratiempo-banner">
+        <div class="ct-icon">▲</div>
+        <div>
+          <div class="ct-title">Contratiempo activo</div>
+          <div class="ct-desc">Documentación incompleta · 4 días detenido</div>
+        </div>
+      </div>
+      <div class="eta-block">
+        <div class="eta-label">Llegada estimada revisada</div>
+        <div class="eta-date">24 Abr 2026</div>
+        <div class="eta-delta">▲ 9 días de retraso vs. ETA original</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-card">
+    <div class="card-title">Etapas del viaje</div>
+    <div class="timeline">
+      <div class="tl-step done">
+        <div class="tl-dot done">✓</div>
+        <div class="tl-label done">Puerto<br>Origen</div>
+        <div class="tl-date">28 Mar</div>
+      </div>
+      <div class="tl-step done">
+        <div class="tl-dot done">✓</div>
+        <div class="tl-label done">Zarpó</div>
+        <div class="tl-date">31 Mar</div>
+      </div>
+      <div class="tl-step done">
+        <div class="tl-dot done">✓</div>
+        <div class="tl-label done">Tránsito<br>Marítimo</div>
+        <div class="tl-date">31 Mar</div>
+      </div>
+      <div class="tl-step done">
+        <div class="tl-dot done">✓</div>
+        <div class="tl-label done">ETA Puerto<br>Destino</div>
+        <div class="tl-date">10 Abr</div>
+      </div>
+      <div class="tl-step alert">
+        <div class="tl-dot alert">▲</div>
+        <div class="tl-label alert">Detenido<br>Aduana</div>
+        <div class="tl-date">10 Abr →</div>
+      </div>
+      <div class="tl-step pending">
+        <div class="tl-dot pending">○</div>
+        <div class="tl-label pending">Liberado<br>Aduana</div>
+        <div class="tl-date">—</div>
+      </div>
+      <div class="tl-step pending">
+        <div class="tl-dot pending">○</div>
+        <div class="tl-label pending">Tránsito<br>Terrestre</div>
+        <div class="tl-date">—</div>
+      </div>
+      <div class="tl-step pending">
+        <div class="tl-dot pending">○</div>
+        <div class="tl-label pending">Entregado</div>
+        <div class="tl-date">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row: Info general + Contratiempo + Historial -->
+  <div class="three-col">
+
+    <!-- Info general -->
+    <div class="info-card">
+      <div class="card-title">Información del viaje</div>
+      <div class="info-grid">
+        <div class="info-field">
+          <div class="if-label">Puerto Origen</div>
+          <div class="if-value">Ningbo, China</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">Puerto Destino</div>
+          <div class="if-value">Manzanillo, México</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">Fecha de Salida</div>
+          <div class="if-value">31 Mar 2026</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">ETA Original</div>
+          <div class="if-value">15 Abr 2026</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">ETA Revisada</div>
+          <div class="if-value" style="color:#C05A00;">24 Abr 2026</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">Días detenido</div>
+          <div class="if-value" style="color:#C05A00; font-size:18px;">4 días</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">Naviera</div>
+          <div class="if-value">MSC Mediterranean</div>
+        </div>
+        <div class="info-field">
+          <div class="if-label">B/L Number</div>
+          <div class="if-value mono">MSCUSHA123456</div>
+        </div>
+        <div class="info-field" style="grid-column: span 2;">
+          <div class="if-label">Aduana</div>
+          <div class="if-value">Manzanillo — Administración 35</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contratiempo -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="ct-card">
+        <div class="ct-card-title">▲ Contratiempo activo</div>
+        <div class="ct-fields">
+          <div class="ct-row">
+            <span class="ct-key">Tipo</span>
+            <span class="ct-val warn">Documentación incompleta</span>
+          </div>
+          <div class="ct-row">
+            <span class="ct-key">Detectado</span>
+            <span class="ct-val">10 Abr 2026</span>
+          </div>
+          <div class="ct-row">
+            <span class="ct-key">Días detenido</span>
+            <span class="ct-val warn">4 días</span>
+          </div>
+          <div class="ct-row">
+            <span class="ct-key">Responsable</span>
+            <span class="ct-val">Ana López</span>
+          </div>
+          <div class="ct-row">
+            <span class="ct-key">Impacto ETA</span>
+            <span class="ct-val warn">+9 días</span>
+          </div>
+        </div>
+        <div class="ct-note">
+          "Falta la factura comercial original firmada. Pendiente envío por DHL desde proveedor en Ningbo. ETA del documento: 18 Abr."
+        </div>
+      </div>
+
+      <!-- Info operador -->
+      <div class="info-card" style="padding:18px 22px;">
+        <div class="card-title" style="margin-bottom:14px;">Operación</div>
+        <div class="info-grid" style="gap:12px 20px;">
+          <div class="info-field">
+            <div class="if-label">Registrado por</div>
+            <div class="if-value" style="font-size:12px;">Ana López</div>
+          </div>
+          <div class="info-field">
+            <div class="if-label">Última actualización</div>
+            <div class="if-value" style="font-size:12px;">14 Abr · 10:23 AM</div>
+          </div>
+          <div class="info-field">
+            <div class="if-label">Tipo de carga</div>
+            <div class="if-value" style="font-size:12px; color:#4A6FA5;">LCL Consolidado</div>
+          </div>
+          <div class="info-field">
+            <div class="if-label">Clientes en contenedor</div>
+            <div class="if-value" style="font-size:12px;">3 clientes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de estados -->
+    <div class="info-card">
+      <div class="card-title">Historial de estados</div>
+      <div class="log-list">
+        <div class="log-item">
+          <div class="log-dot" style="background:#C05A00"></div>
+          <div class="log-content">
+            <div class="log-status">▲ Detenido en Aduana</div>
+            <div class="log-meta">10 Abr · Ana López</div>
+            <div class="log-note">"Falta factura comercial original"</div>
+          </div>
+        </div>
+        <div class="log-item">
+          <div class="log-dot" style="background:#B8860B"></div>
+          <div class="log-content">
+            <div class="log-status">◆ En Aduana</div>
+            <div class="log-meta">10 Abr · Sistema</div>
+          </div>
+        </div>
+        <div class="log-item">
+          <div class="log-dot" style="background:#38BDF8"></div>
+          <div class="log-content">
+            <div class="log-status">◆ ETA Puerto Destino</div>
+            <div class="log-meta">09 Abr · Ana López</div>
+          </div>
+        </div>
+        <div class="log-item">
+          <div class="log-dot" style="background:#4A6FA5"></div>
+          <div class="log-content">
+            <div class="log-status">● En Tránsito Marítimo</div>
+            <div class="log-meta">31 Mar · Ana López</div>
+          </div>
+        </div>
+        <div class="log-item">
+          <div class="log-dot" style="background:#60A5FA"></div>
+          <div class="log-content">
+            <div class="log-status">● Zarpó</div>
+            <div class="log-meta">31 Mar · Ana López</div>
+          </div>
+        </div>
+        <div class="log-item">
+          <div class="log-dot" style="background:#556479"></div>
+          <div class="log-content">
+            <div class="log-status">◇ Puerto Origen</div>
+            <div class="log-meta">28 Mar · Ana López</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventario -->
+  <div class="inv-card">
+    <div class="inv-header">
+      <div>
+        <div class="card-title" style="margin-bottom:4px;">Inventario / Facturas</div>
+        <div class="inv-meta"><strong>3 clientes</strong> · <strong>8 líneas</strong> · Total declarado: <strong>$142,500 USD</strong></div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:10px;">+ Agregar factura</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Factura</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Valor declarado</th>
+          <th>Documento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Cliente 1 -->
+        <tr>
+          <td rowspan="3" style="vertical-align:top; padding-top:16px;"><span class="client-tag">Textiles Monterrey SA</span></td>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">FAC-2026-0441</td>
+          <td>Tela de algodón 100% · 300 rollos</td>
+          <td><span class="qty-badge">300 u.</span></td>
+          <td><span class="value-cell">$28,500 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">FAC-2026-0442</td>
+          <td>Hilo de poliéster · varios colores</td>
+          <td><span class="qty-badge">50 cajas</span></td>
+          <td><span class="value-cell">$8,200 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">FAC-2026-0443</td>
+          <td>Etiquetas y empaques impresos</td>
+          <td><span class="qty-badge">10,000 u.</span></td>
+          <td><span class="value-cell">$3,800 USD</span></td>
+          <td style="color:#C05A00; font-size:10px; font-weight:700;">⚠ Sin PDF</td>
+        </tr>
+        <!-- Separator -->
+        <tr style="background:#f7fafc;">
+          <td colspan="6" style="padding:6px 20px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#8a9aaa;">Electrónica del Norte</td>
+        </tr>
+        <tr>
+          <td><span class="client-tag" style="color:#1A7A8A;background:#f0fafa;border-color:#1A7A8A;">Electrónica del Norte</span></td>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">EN-2026-0189</td>
+          <td>Monitores LED 27" · 4K</td>
+          <td><span class="qty-badge">120 u.</span></td>
+          <td><span class="value-cell">$52,000 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">EN-2026-0190</td>
+          <td>Cables HDMI y adaptadores</td>
+          <td><span class="qty-badge">500 u.</span></td>
+          <td><span class="value-cell">$4,000 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+        <!-- Separator -->
+        <tr style="background:#f7fafc;">
+          <td colspan="6" style="padding:6px 20px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#8a9aaa;">Muebles Guadalajara SA</td>
+        </tr>
+        <tr>
+          <td><span class="client-tag" style="color:#B8860B;background:#fffbf0;border-color:#B8860B;">Muebles Guadalajara SA</span></td>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">MG-2026-0055</td>
+          <td>Sillas ergonómicas de oficina</td>
+          <td><span class="qty-badge">80 u.</span></td>
+          <td><span class="value-cell">$32,000 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td style="font-weight:700; color:#0a1a3c; font-size:11px; font-family:monospace;">MG-2026-0056</td>
+          <td>Escritorios modulares · flat pack</td>
+          <td><span class="qty-badge">30 sets</span></td>
+          <td><span class="value-cell">$14,000 USD</span></td>
+          <td><span style="font-size:10px;color:#4A6FA5;font-weight:600;cursor:pointer;">📄 Ver PDF</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="inv-total">
+      <div class="total-item">8 líneas · <strong>$142,500 USD</strong> valor declarado total</div>
+      <div class="total-item" style="color:#C05A00;">⚠ 1 factura sin documento adjunto</div>
+    </div>
+  </div>
+
+  <!-- Row: Mensajes Helpdesk -->
+  <div class="two-col">
+
+    <!-- Mensajes -->
+    <div class="msgs-card">
+      <div class="msgs-header">
+        <div class="msgs-title">Mensajes — Helpdesk</div>
+        <span class="unread-badge">2 sin leer</span>
+      </div>
+      <div class="msgs-list">
+
+        <div class="msg incoming">
+          <div class="msg-sender">Ana López · Operadora</div>
+          <div class="msg-bubble">Buenos días, el contenedor HLXU3012847 fue detenido en aduana esta mañana. Están solicitando la factura comercial original firmada por el proveedor.</div>
+          <div class="msg-time">10 Abr · 09:14 AM</div>
+        </div>
+
+        <div class="msg outgoing">
+          <div class="msg-sender">Roberto García · Director</div>
+          <div class="msg-bubble">Entendido Ana, ¿ya contactaste al proveedor en Ningbo? Necesitamos el documento lo antes posible.</div>
+          <div class="msg-time">10 Abr · 09:32 AM</div>
+        </div>
+
+        <div class="msg incoming">
+          <div class="msg-sender">Ana López · Operadora</div>
+          <div class="msg-bubble">Sí, ya hablé con ellos. Dijeron que enviarán el original por DHL mañana. ETA del documento aproximadamente 18 de abril.</div>
+          <div class="msg-time">10 Abr · 10:05 AM</div>
+        </div>
+
+        <div class="msg system">
+          <div class="msg-bubble">▲ Sistema — Estado actualizado a "Detenido en Aduana" · 10 Abr 10:23 AM</div>
+        </div>
+
+        <div class="msg incoming">
+          <div class="msg-sender">Ana López · Operadora</div>
+          <div class="msg-bubble">El agente aduanal confirma que con el documento original podemos liberar en 24-48 hrs. Estamos coordinando el recibo en Manzanillo.</div>
+          <div class="msg-time">12 Abr · 03:15 PM</div>
+        </div>
+
+        <div class="msg outgoing">
+          <div class="msg-sender">Roberto García · Director</div>
+          <div class="msg-bubble">Perfecto. Los 3 clientes ya fueron notificados del retraso. Mantenme informado cuando llegue el documento.</div>
+          <div class="msg-time">12 Abr · 04:02 PM</div>
+        </div>
+
+        <div class="msg incoming" style="border-left: 2px solid #C05A00; padding-left:8px;">
+          <div class="msg-sender" style="color:#C05A00;">Muebles Guadalajara · Cliente</div>
+          <div class="msg-bubble" style="background:#fff5f0; color:#181c1e;">Buen día, ¿tienen alguna actualización sobre cuándo se libera nuestro contenedor? Tenemos entregas comprometidas para el 20 de abril.</div>
+          <div class="msg-time" style="color:#C05A00;">14 Abr · 08:50 AM · Sin responder ▲</div>
+        </div>
+
+        <div class="msg incoming" style="border-left: 2px solid #C05A00; padding-left:8px;">
+          <div class="msg-sender" style="color:#C05A00;">Electrónica del Norte · Cliente</div>
+          <div class="msg-bubble" style="background:#fff5f0; color:#181c1e;">¿Cuál es el nuevo ETA estimado? Necesitamos ajustar nuestra cadena de suministro.</div>
+          <div class="msg-time" style="color:#C05A00;">14 Abr · 10:15 AM · Sin responder ▲</div>
+        </div>
+
+      </div>
+      <div class="msgs-input">
+        <textarea class="input-box" placeholder="Responder o agregar nota al expediente..." rows="2"></textarea>
+        <button class="send-btn">➤</button>
+      </div>
+    </div>
+
+    <!-- Docs / Notas adicionales -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="info-card">
+        <div class="card-title" style="margin-bottom:16px;">Documentos adjuntos</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f7fafc;border-radius:7px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:18px;">📄</span>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#181c1e;">Packing List · BL-SHA456</div>
+                <div style="font-size:9px;color:#8a9aaa;">PDF · 340 KB · 28 Mar 2026</div>
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:#4A6FA5;cursor:pointer;">Ver</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f7fafc;border-radius:7px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:18px;">📄</span>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#181c1e;">Certificado de Origen</div>
+                <div style="font-size:9px;color:#8a9aaa;">PDF · 210 KB · 28 Mar 2026</div>
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:#4A6FA5;cursor:pointer;">Ver</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff5f0;border-radius:7px;border:1px solid rgba(192,90,0,0.2);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:18px;">⚠</span>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#C05A00;">Factura Comercial Original</div>
+                <div style="font-size:9px;color:#C05A00;">Pendiente · En tránsito por DHL</div>
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:#C05A00;">ETA 18 Abr</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost" style="width:100%;margin-top:14px;font-size:10px;text-align:center;">+ Subir documento</button>
+      </div>
+
+      <div class="info-card">
+        <div class="card-title" style="margin-bottom:12px;">Notas internas</div>
+        <textarea style="width:100%;background:#f7fafc;border:none;border-radius:7px;padding:10px 12px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:500;color:#181c1e;resize:none;outline:none;min-height:90px;line-height:1.5;" placeholder="Agregar nota interna al expediente...">Agente aduanal: Lic. Marcos Fuentes · Tel. 314-xxx-xxxx. Coordinando recibo de factura en oficina de Manzanillo.</textarea>
+        <button class="btn btn-ghost" style="width:100%;margin-top:10px;font-size:10px;">Guardar nota</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
