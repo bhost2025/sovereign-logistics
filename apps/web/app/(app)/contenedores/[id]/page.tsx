@@ -1,5 +1,6 @@
 import { getContainerById } from '@/lib/containers'
 import { StatusBadge, STATUS_CONFIG } from '@/components/status-badge'
+import { ChangeStatusForm } from '@/components/change-status-form'
 import { notFound } from 'next/navigation'
 
 export default async function ContenedorDetallePage({
@@ -118,6 +119,12 @@ export default async function ContenedorDetallePage({
               <p className="text-xs text-[#181c1e]">{container.notes}</p>
             </div>
           )}
+
+          {/* Cambiar estado */}
+          <ChangeStatusForm
+            containerId={container.id}
+            currentStatus={container.current_status}
+          />
         </div>
 
         {/* Columna derecha: Timeline */}
