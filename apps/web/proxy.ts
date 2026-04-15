@@ -10,7 +10,7 @@ const ROUTE_ROLES: Record<string, string[]> = {
   '/admin':        ['super_admin'],
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { supabaseResponse, user, supabase } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 
