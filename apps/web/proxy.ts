@@ -4,8 +4,8 @@ import { updateSession } from '@/lib/supabase/middleware'
 const ROUTE_ROLES: Record<string, string[]> = {
   '/dashboard':    ['super_admin', 'director'],
   '/tablero':      ['super_admin', 'operator'],
-  '/contenedores': ['super_admin', 'operator'],
-  '/clientes':     ['super_admin', 'operator'],
+  '/contenedores': ['super_admin', 'operator', 'director'],
+  '/clientes':     ['super_admin', 'operator', 'director'],
   '/facturas':     ['super_admin', 'operator'],
   '/admin':        ['super_admin'],
 }

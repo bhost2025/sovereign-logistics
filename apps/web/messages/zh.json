@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "dashboard": "仪表板",
+    "tablero": "操作看板",
+    "contenedores": "集装箱",
+    "clientes": "客户",
+    "admin": "管理",
+    "signOut": "退出登录"
+  },
+  "status": {
+    "en_puerto_origen": "起运港",
+    "zarpo": "已启航",
+    "en_transito_maritimo": "海运中",
+    "eta_puerto_destino": "预计到港",
+    "en_aduana": "清关中",
+    "liberado_aduana": "已放行",
+    "detenido_aduana": "海关扣押",
+    "transito_terrestre": "陆运中",
+    "entregado": "已交付"
+  },
+  "containers": {
+    "title": "集装箱",
+    "new": "+ 新建集装箱",
+    "container": "箱号",
+    "bl": "提单",
+    "client": "客户",
+    "route": "航线",
+    "eta": "预计到达",
+    "status": "状态",
+    "empty": "暂无集装箱记录。",
+    "back": "← 看板",
+    "tripData": "运输信息",
+    "originPort": "起运港",
+    "destPort": "目的港",
+    "departure": "出发日期",
+    "arrival": "到达日期",
+    "lclClients": "拼箱客户",
+    "addClient": "+ 添加",
+    "noClients": "暂无关联客户。",
+    "invoicesSection": "发票",
+    "newInvoice": "+ 新建",
+    "noInvoices": "暂无发票记录。",
+    "notes": "备注",
+    "statusHistory": "状态历史",
+    "noHistory": "暂无历史记录",
+    "currentStatus": "当前状态",
+    "by": "操作人"
+  },
+  "clients": {
+    "title": "客户",
+    "new": "+ 新建客户",
+    "contact": "联系人",
+    "email": "邮箱",
+    "phone": "电话",
+    "containers": "集装箱",
+    "empty": "暂无客户。",
+    "inactive": "已停用"
+  },
+  "dashboard": {
+    "title": "管理仪表板",
+    "subtitle": "总监视图 · 只读",
+    "exportPdf": "↓ 导出 PDF",
+    "total": "总计",
+    "inTransit": "运输中",
+    "inCustoms": "清关中",
+    "detained": "被扣押",
+    "delivered": "已交付",
+    "invoices": "发票",
+    "topClients": "主要客户",
+    "volumeMonth": "每月集装箱量",
+    "upcoming": "即将到达",
+    "next30": "未来30天",
+    "alerts": "预警",
+    "noAlerts": "暂无预警",
+    "detainedCustoms": "海关扣押",
+    "noUpcoming": "未来30天内无集装箱到达",
+    "today": "今天",
+    "tomorrow": "明天",
+    "inDays": "{days}天后",
+    "totalDeclared": "申报总值",
+    "sinDatos": "暂无数据"
+  },
+  "admin": {
+    "title": "用户管理",
+    "newUser": "+ 新建用户",
+    "name": "姓名",
+    "role": "角色",
+    "status": "状态",
+    "active": "启用",
+    "inactive": "停用",
+    "edit": "编辑 →",
+    "roles": {
+      "super_admin": "超级管理员",
+      "operator": "操作员",
+      "director": "总监",
+      "client_viewer": "客户"
+    },
+    "language": "语言",
+    "languages": {
+      "es": "Español",
+      "en": "English",
+      "zh": "中文"
+    }
+  },
+  "invoices": {
+    "pendiente": "待付款",
+    "pagada": "已付款",
+    "cancelada": "已取消"
+  }
+}

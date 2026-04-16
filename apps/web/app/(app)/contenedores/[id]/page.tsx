@@ -2,6 +2,7 @@ import { getContainerById } from '@/lib/containers'
 import { StatusBadge, STATUS_CONFIG } from '@/components/status-badge'
 import { ChangeStatusForm } from '@/components/change-status-form'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 export default async function ContenedorDetallePage({
   params,
@@ -9,7 +10,11 @@ export default async function ContenedorDetallePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const container = await getContainerById(id).catch(() => null)
+  const [container, t, ts] = await Promise.all([
+    getContainerById(id).catch(() => null),
+    getTranslations('containers'),
+    getTranslations('status'),
+  ])
   if (!container) notFound()
 
   const log = container.container_status_log ?? []
@@ -24,7 +29,7 @@ export default async function ContenedorDetallePage({
       <div className="flex items-start justify-between mb-8">
         <div>
           <a href="/tablero" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
-            ← Tablero
+            {t('back')}
           </a>
           <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-2 font-mono">
             {container.container_number}
@@ -37,7 +42,7 @@ export default async function ContenedorDetallePage({
           {isLcl && (
             <span className="text-xs font-bold bg-sky-100 text-sky-700 px-2.5 py-1 rounded">LCL</span>
           )}
-          <StatusBadge status={container.current_status} />
+          <StatusBadge status={container.current_status} label={ts(container.current_status as any)} />
         </div>
       </div>
 
@@ -46,14 +51,14 @@ export default async function ContenedorDetallePage({
         <div className="space-y-5">
           {/* Info del contenedor */}
           <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-5">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-4">Datos del viaje</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-4">{t('tripData')}</h2>
             <div className="space-y-3">
               {[
-                { label: 'Puerto Origen', value: container.origin_port },
-                { label: 'Puerto Destino', value: container.destination_port },
-                { label: 'Salida', value: container.departure_date ? new Date(container.departure_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
-                { label: 'ETA', value: container.eta_date ? new Date(container.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
-                { label: 'Llegada', value: container.arrival_date ? new Date(container.arrival_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                { label: t('originPort'), value: container.origin_port },
+                { label: t('destPort'),   value: container.destination_port },
+                { label: t('departure'),  value: container.departure_date ? new Date(container.departure_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                { label: t('eta'),        value: container.eta_date ? new Date(container.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                { label: t('arrival'),    value: container.arrival_date ? new Date(container.arrival_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between items-baseline">
                   <span className="text-[10px] font-bold text-[#8a9aaa] uppercase tracking-wider">{label}</span>
@@ -65,9 +70,17 @@ export default async function ContenedorDetallePage({
 
           {/* Clientes LCL */}
           <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-5">
-            <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-4">
-              {isLcl ? `Clientes LCL (${clients.length})` : 'Cliente'}
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
+                {isLcl ? `${t('lclClients')} (${clients.length})` : t('client')}
+              </h2>
+              <a
+                href={`/contenedores/${container.id}/agregar-cliente`}
+                className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
+              >
+                {t('addClient')}
+              </a>
+            </div>
             <div className="space-y-3">
               {clients.map((cc, i) => (
                 <div key={i} className="flex items-start justify-between gap-2">
@@ -87,13 +100,26 @@ export default async function ContenedorDetallePage({
                   )}
                 </div>
               ))}
+              {clients.length === 0 && (
+                <p className="text-[11px] text-[#b0bac3]">{t('noClients')}</p>
+              )}
             </div>
           </div>
 
           {/* Facturas */}
-          {invoices.length > 0 && (
-            <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-5">
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-4">Facturas</h2>
+          <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
+                {t('invoicesSection')} {invoices.length > 0 && `(${invoices.length})`}
+              </h2>
+              <a
+                href={`/contenedores/${container.id}/facturas/nueva`}
+                className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
+              >
+                {t('newInvoice')}
+              </a>
+            </div>
+            {invoices.length > 0 ? (
               <div className="space-y-2">
                 {invoices.map(inv => (
                   <div key={inv.id} className="flex items-center justify-between">
@@ -109,13 +135,15 @@ export default async function ContenedorDetallePage({
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-[11px] text-[#b0bac3]">{t('noInvoices')}</p>
+            )}
+          </div>
 
           {/* Notas */}
           {container.notes && (
             <div className="bg-[#fdf8ec] border-l-[3px] border-[#B8860B] rounded-r-xl p-4">
-              <div className="text-[10px] font-bold uppercase tracking-widest text-[#B8860B] mb-1">Notas</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[#B8860B] mb-1">{t('notes')}</div>
               <p className="text-xs text-[#181c1e]">{container.notes}</p>
             </div>
           )}
@@ -129,10 +157,10 @@ export default async function ContenedorDetallePage({
 
         {/* Columna derecha: Timeline */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-6">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-6">Historial de estados</h2>
+          <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-6">{t('statusHistory')}</h2>
 
           {log.length === 0 ? (
-            <p className="text-xs text-[#b0bac3] text-center py-8">Sin historial registrado</p>
+            <p className="text-xs text-[#b0bac3] text-center py-8">{t('noHistory')}</p>
           ) : (
             <div className="relative">
               {/* Línea vertical */}
@@ -165,7 +193,7 @@ export default async function ContenedorDetallePage({
                             className="text-xs font-bold"
                             style={{ color: isCurrent ? statusCfg.color : '#181c1e' }}
                           >
-                            {statusCfg.label}
+                            {ts(entry.new_status as any)}
                           </span>
                           <span className="text-[10px] text-[#8a9aaa] shrink-0">
                             {new Date(entry.changed_at).toLocaleDateString('es-MX', {
@@ -177,7 +205,7 @@ export default async function ContenedorDetallePage({
                           <p className="text-[11px] text-[#6b7a8a] mt-0.5">{entry.notes}</p>
                         )}
                         {entry.users?.full_name && (
-                          <p className="text-[10px] text-[#b0bac3] mt-0.5">por {entry.users.full_name}</p>
+                          <p className="text-[10px] text-[#b0bac3] mt-0.5">{t('by')} {entry.users.full_name}</p>
                         )}
                       </div>
                     </div>
@@ -192,8 +220,8 @@ export default async function ContenedorDetallePage({
             <div className="flex items-center gap-3 p-4 rounded-lg mt-4" style={{ background: cfg.bg }}>
               <span className="text-xl" style={{ color: cfg.color }}>{cfg.symbol}</span>
               <div>
-                <div className="text-sm font-bold" style={{ color: cfg.color }}>{cfg.label}</div>
-                <div className="text-[10px] text-[#8a9aaa]">Estado actual</div>
+                <div className="text-sm font-bold" style={{ color: cfg.color }}>{ts(container.current_status as any)}</div>
+                <div className="text-[10px] text-[#8a9aaa]">{t('currentStatus')}</div>
               </div>
             </div>
           )}

@@ -1,5 +1,6 @@
 import { getContainersByStatus } from '@/lib/containers'
 import { StatusBadge, STATUS_CONFIG, type ContainerStatus } from '@/components/status-badge'
+import { getTranslations } from 'next-intl/server'
 
 const COLUMNS: ContainerStatus[] = [
   'en_puerto_origen', 'zarpo', 'en_transito_maritimo', 'eta_puerto_destino',
@@ -7,7 +8,11 @@ const COLUMNS: ContainerStatus[] = [
 ]
 
 export default async function TableroPage() {
-  const containers = await getContainersByStatus()
+  const [containers, t, tn] = await Promise.all([
+    getContainersByStatus(),
+    getTranslations('status'),
+    getTranslations('nav'),
+  ])
 
   const byStatus = COLUMNS.reduce((acc, s) => {
     acc[s] = containers.filter(c => c.current_status === s)
@@ -19,14 +24,14 @@ export default async function TableroPage() {
       {/* Topbar */}
       <div className="px-8 py-4 flex items-center justify-between border-b border-[#e8ebee] bg-white/60 backdrop-blur-sm shrink-0">
         <div>
-          <h1 className="text-base font-extrabold text-[#0a1a3c] tracking-tight">Tablero Operador</h1>
-          <p className="text-[10px] text-[#8a9aaa] font-medium">{containers.length} contenedores</p>
+          <h1 className="text-base font-extrabold text-[#0a1a3c] tracking-tight">{tn('tablero')}</h1>
+          <p className="text-[10px] text-[#8a9aaa] font-medium">{containers.length} {tn('contenedores').toLowerCase()}</p>
         </div>
         <a
           href="/contenedores/nuevo"
           className="bg-[#0a1a3c] text-white text-xs font-bold px-4 py-2 rounded-md hover:bg-[#142a5c] transition-colors"
         >
-          + Nuevo Contenedor
+          + {tn('contenedores')}
         </a>
       </div>
 
@@ -34,8 +39,9 @@ export default async function TableroPage() {
       <div className="flex-1 overflow-x-auto p-6">
         <div className="flex gap-4 h-full min-w-max">
           {COLUMNS.map(status => {
-            const cfg = STATUS_CONFIG[status]
-            const cards = byStatus[status]
+            const cfg    = STATUS_CONFIG[status]
+            const label  = t(status as any)
+            const cards  = byStatus[status]
             const isAlert = status === 'detenido_aduana'
 
             return (
@@ -46,7 +52,7 @@ export default async function TableroPage() {
                   style={{ background: cfg.bg, borderTop: `3px solid ${cfg.color}` }}
                 >
                   <span className="text-[11px] font-bold" style={{ color: cfg.color }}>
-                    {cfg.symbol} {cfg.label}
+                    {cfg.symbol} {label}
                   </span>
                   <span
                     className="text-[10px] font-bold px-1.5 py-0.5 rounded"

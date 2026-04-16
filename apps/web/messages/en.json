@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "tablero": "Board",
+    "contenedores": "Containers",
+    "clientes": "Clients",
+    "admin": "Admin",
+    "signOut": "Sign out"
+  },
+  "status": {
+    "en_puerto_origen": "Origin Port",
+    "zarpo": "Departed",
+    "en_transito_maritimo": "In Transit",
+    "eta_puerto_destino": "ETA Port",
+    "en_aduana": "In Customs",
+    "liberado_aduana": "Cleared",
+    "detenido_aduana": "Detained",
+    "transito_terrestre": "Land Transit",
+    "entregado": "Delivered"
+  },
+  "containers": {
+    "title": "Containers",
+    "new": "+ New Container",
+    "container": "Container",
+    "bl": "BL",
+    "client": "Client",
+    "route": "Route",
+    "eta": "ETA",
+    "status": "Status",
+    "empty": "No containers registered.",
+    "back": "← Board",
+    "tripData": "Trip Details",
+    "originPort": "Origin Port",
+    "destPort": "Destination Port",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "lclClients": "LCL Clients",
+    "addClient": "+ Add",
+    "noClients": "No clients linked.",
+    "invoicesSection": "Invoices",
+    "newInvoice": "+ New",
+    "noInvoices": "No invoices registered.",
+    "notes": "Notes",
+    "statusHistory": "Status History",
+    "noHistory": "No history recorded",
+    "currentStatus": "Current status",
+    "by": "by"
+  },
+  "clients": {
+    "title": "Clients",
+    "new": "+ New Client",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "containers": "Containers",
+    "empty": "No clients.",
+    "inactive": "Inactive"
+  },
+  "dashboard": {
+    "title": "Executive Dashboard",
+    "subtitle": "Director view · Read only",
+    "exportPdf": "↓ Export PDF",
+    "total": "Total",
+    "inTransit": "In Transit",
+    "inCustoms": "In Customs",
+    "detained": "Detained",
+    "delivered": "Delivered",
+    "invoices": "Invoices",
+    "topClients": "Top Clients",
+    "volumeMonth": "Containers / Month",
+    "upcoming": "Arriving Soon",
+    "next30": "Next 30 days",
+    "alerts": "Alerts",
+    "noAlerts": "No active alerts",
+    "detainedCustoms": "Detained in customs",
+    "noUpcoming": "No containers with ETA in the next 30 days",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "inDays": "in {days}d",
+    "totalDeclared": "Total Declared",
+    "sinDatos": "No data"
+  },
+  "admin": {
+    "title": "Users",
+    "newUser": "+ New User",
+    "name": "Name",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "edit": "Edit →",
+    "roles": {
+      "super_admin": "Super Admin",
+      "operator": "Operator",
+      "director": "Director",
+      "client_viewer": "Client"
+    },
+    "language": "Language",
+    "languages": {
+      "es": "Español",
+      "en": "English",
+      "zh": "中文"
+    }
+  },
+  "invoices": {
+    "pendiente": "Pending",
+    "pagada": "Paid",
+    "cancelada": "Cancelled"
+  }
+}

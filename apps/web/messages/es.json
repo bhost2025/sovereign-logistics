@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "tablero": "Tablero",
+    "contenedores": "Contenedores",
+    "clientes": "Clientes",
+    "admin": "Admin",
+    "signOut": "Cerrar sesión"
+  },
+  "status": {
+    "en_puerto_origen": "Puerto Origen",
+    "zarpo": "Zarpó",
+    "en_transito_maritimo": "En Tránsito",
+    "eta_puerto_destino": "ETA Puerto",
+    "en_aduana": "En Aduana",
+    "liberado_aduana": "Liberado",
+    "detenido_aduana": "Detenido",
+    "transito_terrestre": "Tránsito Terrestre",
+    "entregado": "Entregado"
+  },
+  "containers": {
+    "title": "Contenedores",
+    "new": "+ Nuevo Contenedor",
+    "container": "Contenedor",
+    "bl": "BL",
+    "client": "Cliente",
+    "route": "Ruta",
+    "eta": "ETA",
+    "status": "Estado",
+    "empty": "Sin contenedores registrados.",
+    "back": "← Tablero",
+    "tripData": "Datos del viaje",
+    "originPort": "Puerto Origen",
+    "destPort": "Puerto Destino",
+    "departure": "Salida",
+    "arrival": "Llegada",
+    "lclClients": "Clientes LCL",
+    "addClient": "+ Agregar",
+    "noClients": "Sin clientes vinculados.",
+    "invoicesSection": "Facturas",
+    "newInvoice": "+ Nueva",
+    "noInvoices": "Sin facturas registradas.",
+    "notes": "Notas",
+    "statusHistory": "Historial de estados",
+    "noHistory": "Sin historial registrado",
+    "currentStatus": "Estado actual",
+    "by": "por"
+  },
+  "clients": {
+    "title": "Clientes",
+    "new": "+ Nuevo Cliente",
+    "contact": "Contacto",
+    "email": "Email",
+    "phone": "Teléfono",
+    "containers": "Contenedores",
+    "empty": "Sin clientes.",
+    "inactive": "Inactivo"
+  },
+  "dashboard": {
+    "title": "Dashboard Ejecutivo",
+    "subtitle": "Vista de dirección · Solo lectura",
+    "exportPdf": "↓ Exportar PDF",
+    "total": "Total",
+    "inTransit": "En Tránsito",
+    "inCustoms": "En Aduana",
+    "detained": "Detenidos",
+    "delivered": "Entregados",
+    "invoices": "Facturas",
+    "topClients": "Top Clientes",
+    "volumeMonth": "Contenedores / Mes",
+    "upcoming": "Próximos a Llegar",
+    "next30": "Próximos 30 días",
+    "alerts": "Alertas",
+    "noAlerts": "Sin alertas activas",
+    "detainedCustoms": "Detenido en aduana",
+    "noUpcoming": "Sin contenedores con ETA en los próximos 30 días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "inDays": "en {days}d",
+    "totalDeclared": "Total Declarado",
+    "sinDatos": "Sin datos"
+  },
+  "admin": {
+    "title": "Usuarios",
+    "newUser": "+ Nuevo Usuario",
+    "name": "Nombre",
+    "role": "Rol",
+    "status": "Estado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "edit": "Editar →",
+    "roles": {
+      "super_admin": "Super Admin",
+      "operator": "Operador",
+      "director": "Director",
+      "client_viewer": "Cliente"
+    },
+    "language": "Idioma",
+    "languages": {
+      "es": "Español",
+      "en": "English",
+      "zh": "中文"
+    }
+  },
+  "invoices": {
+    "pendiente": "Pendiente",
+    "pagada": "Pagada",
+    "cancelada": "Cancelada"
+  }
+}
