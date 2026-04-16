@@ -12,7 +12,12 @@ const LANG_OPTIONS = [
 ]
 
 async function getLocaleMessages(locale: Locale) {
-  return (await import(`../../messages/${locale}.json`)).default
+  const loaders: Record<Locale, () => Promise<{ default: any }>> = {
+    es: () => import('../../messages/es.json'),
+    en: () => import('../../messages/en.json'),
+    zh: () => import('../../messages/zh.json'),
+  }
+  return (await loaders[locale]()).default
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

@@ -35,8 +35,14 @@ export default getRequestConfig(async () => {
     } catch {}
   }
 
+  const loaders: Record<Locale, () => Promise<{ default: any }>> = {
+    es: () => import('../messages/es.json'),
+    en: () => import('../messages/en.json'),
+    zh: () => import('../messages/zh.json'),
+  }
+
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: (await loaders[locale]()).default,
   }
 })
