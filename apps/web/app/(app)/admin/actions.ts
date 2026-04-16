@@ -34,13 +34,13 @@ export async function createUserAction(formData: FormData) {
   }
 
   // Insert profile
-  const { error: profileError } = await admin.from('users').insert({
+  const { error: profileError } = await (admin as any).from('users').insert({
     id:         authData.user.id,
     company_id: profile.company_id,
     full_name:  fullName,
     email,
-    role:       role as any,
-    language:   language as any,
+    role,
+    language,
   })
 
   if (profileError) {
@@ -63,9 +63,9 @@ export async function updateUserAction(formData: FormData) {
   const isActive = formData.get('is_active') === 'true'
   const language = (formData.get('language') as string) || 'es'
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('users')
-    .update({ full_name: fullName, role: role as any, is_active: isActive, language: language as any })
+    .update({ full_name: fullName, role, is_active: isActive, language })
     .eq('id', userId)
 
   if (error) redirect(`/admin/usuarios/${userId}?error=1`)

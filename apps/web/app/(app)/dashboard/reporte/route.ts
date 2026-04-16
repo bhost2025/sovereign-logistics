@@ -29,10 +29,10 @@ export async function GET() {
       generatedAt,
     })
 
-    const buffer = await renderToBuffer(element)
+    const buffer = await renderToBuffer(element as any)
     const filename = `reporte-ejecutivo-${new Date().toISOString().slice(0, 10)}.pdf`
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
