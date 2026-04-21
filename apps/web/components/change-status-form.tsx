@@ -1,5 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
+import { useTranslations } from 'next-intl'
 import { updateContainerStatus } from '@/app/(app)/contenedores/actions'
 import { STATUS_CONFIG, type ContainerStatus } from './status-badge'
 
@@ -19,6 +20,8 @@ export function ChangeStatusForm({
   const [selected, setSelected] = useState<ContainerStatus>(currentStatus)
   const [notes, setNotes] = useState('')
   const [pending, startTransition] = useTransition()
+  const t  = useTranslations('containers')
+  const ts = useTranslations('status')
 
   function handleSubmit() {
     if (selected === currentStatus) { setOpen(false); return }
@@ -33,14 +36,14 @@ export function ChangeStatusForm({
         onClick={() => setOpen(true)}
         className="mt-4 w-full text-xs font-bold bg-[#0a1a3c] text-white py-2.5 rounded-md hover:bg-[#142a5c] transition-colors"
       >
-        Cambiar Estado
+        {t('changeStatus')}
       </button>
     )
   }
 
   return (
     <div className="mt-4 bg-[#f7fafc] rounded-xl p-4 space-y-3 border border-[#e8ebee]">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">Nuevo Estado</p>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('newStatus')}</p>
       <div className="space-y-1.5">
         {ALL_STATUSES.map(s => {
           const cfg = STATUS_CONFIG[s]
@@ -59,8 +62,8 @@ export function ChangeStatusForm({
               }}
             >
               <span style={{ color: cfg.color }}>{cfg.symbol}</span>
-              {cfg.label}
-              {isCurrent && <span className="ml-auto text-[9px] font-bold text-[#b0bac3]">Actual</span>}
+              {ts(s as any)}
+              {isCurrent && <span className="ml-auto text-[9px] font-bold text-[#b0bac3]">{t('current')}</span>}
             </button>
           )
         })}
@@ -69,7 +72,7 @@ export function ChangeStatusForm({
       <textarea
         value={notes}
         onChange={e => setNotes(e.target.value)}
-        placeholder="Notas del cambio (opcional)…"
+        placeholder={t('notesOptional')}
         rows={2}
         className="w-full text-xs bg-white border border-[#e8ebee] rounded-md px-3 py-2 resize-none text-[#181c1e] placeholder:text-[#b0bac3] focus:border-[#0a1a3c] outline-none"
       />
@@ -80,13 +83,13 @@ export function ChangeStatusForm({
           disabled={pending || selected === currentStatus}
           className="flex-1 text-xs font-bold bg-[#0a1a3c] text-white py-2 rounded-md hover:bg-[#142a5c] transition-colors disabled:opacity-40"
         >
-          {pending ? 'Guardando…' : 'Confirmar cambio'}
+          {pending ? t('savingChange') : t('confirmChange')}
         </button>
         <button
           onClick={() => setOpen(false)}
           className="text-xs font-semibold text-[#8a9aaa] px-3 hover:text-[#181c1e]"
         >
-          Cancelar
+          {t('cancel')}
         </button>
       </div>
     </div>

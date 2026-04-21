@@ -1,9 +1,9 @@
+import { getTranslations } from 'next-intl/server'
 import {
   getContainerDocuments,
   groupDocumentsByCategory,
   getMissingRequiredCategories,
   DOC_STATUS_CONFIG,
-  DOCUMENT_CATEGORIES,
   type ContainerDocument,
 } from '@/lib/documents'
 import { UploadDocumentForm } from './upload-document-form'
@@ -25,9 +25,11 @@ function DocStatusBadge({ status }: { status: ContainerDocument['doc_status'] })
 function DocumentRow({
   doc,
   containerId,
+  labels,
 }: {
   doc: ContainerDocument
   containerId: string
+  labels: { view: string; download: string; approve: string; reject: string; byUploader: string }
 }) {
   const approveAction = updateDocumentStatus.bind(null, doc.id, containerId, 'approved')
   const rejectAction  = updateDocumentStatus.bind(null, doc.id, containerId, 'rejected')
@@ -42,7 +44,7 @@ function DocumentRow({
         </div>
         <div className="flex items-center gap-3 text-[10px] text-[#8a9aaa]">
           {doc.uploader?.full_name && (
-            <span>por {doc.uploader.full_name}</span>
+            <span>{labels.byUploader} {doc.uploader.full_name}</span>
           )}
           <span>{new Date(doc.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
         </div>
@@ -57,25 +59,25 @@ function DocumentRow({
           rel="noopener noreferrer"
           className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
         >
-          Ver
+          {labels.view}
         </a>
         <a
           href={doc.file_url}
           download={doc.file_name}
           className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
         >
-          Descargar
+          {labels.download}
         </a>
-        {doc.doc_status === 'uploaded' || doc.doc_status === 'pending_review' ? (
+        {(doc.doc_status === 'uploaded' || doc.doc_status === 'pending_review') ? (
           <>
             <form action={approveAction}>
               <button type="submit" className="text-[10px] font-bold text-[#1A7A8A] hover:text-[#0a1a3c] transition-colors">
-                ✓ Aprobar
+                {labels.approve}
               </button>
             </form>
             <form action={rejectAction}>
               <button type="submit" className="text-[10px] font-bold text-[#C05A00] hover:text-[#0a1a3c] transition-colors">
-                ▲ Rechazar
+                {labels.reject}
               </button>
             </form>
           </>
@@ -84,7 +86,6 @@ function DocumentRow({
           <button
             type="submit"
             className="text-[10px] font-bold text-[#b0bac3] hover:text-[#C05A00] transition-colors"
-            title="Eliminar documento"
           >
             ✕
           </button>
@@ -101,17 +102,25 @@ export async function DocumentsTab({
   containerId: string
   filterStatus?: string
 }) {
-  const docs   = await getContainerDocuments(containerId)
-  const groups = groupDocumentsByCategory(docs)
+  const [docs, t] = await Promise.all([
+    getContainerDocuments(containerId),
+    getTranslations('documents'),
+  ])
+
+  const groups  = groupDocumentsByCategory(docs)
   const missing = getMissingRequiredCategories(docs)
 
-  const filteredDocs = filterStatus
-    ? docs.filter(d => d.doc_status === filterStatus)
-    : docs
+  const totalDocs    = docs.length
+  const approvedDocs = docs.filter(d => d.doc_status === 'approved').length
+  const pendingDocs  = docs.filter(d => d.doc_status === 'pending_review' || d.doc_status === 'uploaded').length
 
-  const totalDocs     = docs.length
-  const approvedDocs  = docs.filter(d => d.doc_status === 'approved').length
-  const pendingDocs   = docs.filter(d => d.doc_status === 'pending_review' || d.doc_status === 'uploaded').length
+  const docLabels = {
+    view:       t('preview'),
+    download:   t('download'),
+    approve:    t('approve'),
+    reject:     t('reject'),
+    byUploader: t('byUploader'),
+  }
 
   return (
     <div className="space-y-5">
@@ -120,7 +129,7 @@ export async function DocumentsTab({
       {missing.length > 0 && (
         <div className="bg-[#fef4ed] border-l-[3px] border-[#C05A00] rounded-r-xl p-4">
           <div className="text-[10px] font-bold uppercase tracking-widest text-[#C05A00] mb-1">
-            ▲ {missing.length} documento{missing.length > 1 ? 's' : ''} requerido{missing.length > 1 ? 's' : ''} faltante{missing.length > 1 ? 's' : ''}
+            ▲ {missing.length} {t('missing').toLowerCase()} {t('required')}
           </div>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {missing.map(cat => (
@@ -136,31 +145,31 @@ export async function DocumentsTab({
       <div className="flex items-center gap-6 bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] px-5 py-3">
         <div className="text-center">
           <div className="text-lg font-extrabold text-[#0a1a3c]">{totalDocs}</div>
-          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">Total</div>
+          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('total')}</div>
         </div>
         <div className="w-px h-8 bg-[#f0f2f5]" />
         <div className="text-center">
           <div className="text-lg font-extrabold text-[#1A7A8A]">{approvedDocs}</div>
-          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">Aprobados</div>
+          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('approved')}</div>
         </div>
         <div className="w-px h-8 bg-[#f0f2f5]" />
         <div className="text-center">
           <div className="text-lg font-extrabold text-[#B8860B]">{pendingDocs}</div>
-          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">Pendientes</div>
+          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('pending')}</div>
         </div>
         <div className="w-px h-8 bg-[#f0f2f5]" />
         <div className="text-center">
           <div className="text-lg font-extrabold text-[#C05A00]">{missing.length}</div>
-          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">Faltantes</div>
+          <div className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('missing')}</div>
         </div>
         <div className="flex-1" />
         {/* Filter strip */}
         <div className="flex gap-1">
           {[
-            { label: 'Todos',     value: '' },
-            { label: '✓ Aprob.',  value: 'approved' },
-            { label: '◆ Pend.',   value: 'pending_review' },
-            { label: '▲ Rechan.', value: 'rejected' },
+            { label: t('filterAll'),      value: '' },
+            { label: t('filterApproved'), value: 'approved' },
+            { label: t('filterPending'),  value: 'pending_review' },
+            { label: t('filterRejected'), value: 'rejected' },
           ].map(f => (
             <a
               key={f.value}
@@ -187,7 +196,7 @@ export async function DocumentsTab({
             ? group.documents.filter(d => d.doc_status === filterStatus)
             : group.documents
 
-          const hasAnyDocs = group.documents.length > 0
+          const hasAnyDocs  = group.documents.length > 0
           const allApproved = hasAnyDocs && group.documents.every(d => d.doc_status === 'approved')
           const hasMissing  = group.required && !hasAnyDocs
 
@@ -212,15 +221,15 @@ export async function DocumentsTab({
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] font-bold text-[#181c1e]">{group.label}</span>
                   {group.required && (
-                    <span className="text-[9px] font-bold text-[#8a9aaa] uppercase tracking-wider">requerido</span>
+                    <span className="text-[9px] font-bold text-[#8a9aaa] uppercase tracking-wider">{t('required')}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold text-[#8a9aaa]">
                     {group.documents.length} doc{group.documents.length !== 1 ? 's' : ''}
                   </span>
-                  {hasMissing && <span className="text-[10px] font-bold text-[#C05A00]">▲ Faltante</span>}
-                  {allApproved && <span className="text-[10px] font-bold text-[#1A7A8A]">✓ Completo</span>}
+                  {hasMissing  && <span className="text-[10px] font-bold text-[#C05A00]">{t('missingLabel')}</span>}
+                  {allApproved && <span className="text-[10px] font-bold text-[#1A7A8A]">{t('completeLabel')}</span>}
                 </div>
               </div>
 
@@ -228,11 +237,11 @@ export async function DocumentsTab({
               <div className="px-4 pb-3">
                 {groupDocs.length > 0 ? (
                   groupDocs.map(doc => (
-                    <DocumentRow key={doc.id} doc={doc} containerId={containerId} />
+                    <DocumentRow key={doc.id} doc={doc} containerId={containerId} labels={docLabels} />
                   ))
                 ) : (
                   <p className="text-[11px] text-[#b0bac3] py-3 text-center">
-                    {filterStatus ? 'Sin documentos con este filtro' : 'Sin documentos'}
+                    {filterStatus ? t('noDocsFilter') : t('noDocuments')}
                   </p>
                 )}
               </div>

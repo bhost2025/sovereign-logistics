@@ -7,12 +7,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
 type Tab = 'info' | 'documentos' | 'historial' | 'facturas'
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'info',        label: 'Información' },
-  { id: 'documentos',  label: 'Documentos'  },
-  { id: 'historial',   label: 'Historial'   },
-  { id: 'facturas',    label: 'Facturas'    },
-]
+const TAB_IDS: Tab[] = ['info', 'documentos', 'historial', 'facturas']
 
 function formatLastSeen(updatedAt: string) {
   const diff = Date.now() - new Date(updatedAt).getTime()
@@ -35,7 +30,7 @@ export default async function ContenedorDetallePage({
   const { id }                  = await params
   const { tab: tabParam, doc_status: docStatusParam } = await searchParams
 
-  const activeTab: Tab = (TABS.find(t => t.id === tabParam)?.id) ?? 'info'
+  const activeTab: Tab = (TAB_IDS.find(id => id === tabParam) as Tab | undefined) ?? 'info'
 
   const [container, t, ts] = await Promise.all([
     getContainerById(id).catch(() => null),
@@ -71,8 +66,8 @@ export default async function ContenedorDetallePage({
           <div className="flex items-center gap-2 mt-2 text-[10px] text-[#8a9aaa]">
             <span>◎</span>
             <span>
-              Última actualización: <strong className="text-[#556479]">{formatLastSeen(container.updated_at)}</strong>
-              {lastUpdater && <> · por <strong className="text-[#556479]">{lastUpdater}</strong></>}
+              {t('lastUpdated')}: <strong className="text-[#556479]">{formatLastSeen(container.updated_at)}</strong>
+              {lastUpdater && <> · {t('by')} <strong className="text-[#556479]">{lastUpdater}</strong></>}
             </span>
           </div>
         </div>
@@ -86,19 +81,22 @@ export default async function ContenedorDetallePage({
 
       {/* Tab navigation */}
       <div className="flex items-center gap-0.5 mb-6 border-b border-[#e8ebee]">
-        {TABS.map(tab => (
-          <a
-            key={tab.id}
-            href={`/contenedores/${container.id}?tab=${tab.id}`}
-            className={`px-4 py-2.5 text-xs font-bold transition-colors border-b-2 -mb-px ${
-              activeTab === tab.id
-                ? 'border-[#0a1a3c] text-[#0a1a3c]'
-                : 'border-transparent text-[#8a9aaa] hover:text-[#181c1e]'
-            }`}
-          >
-            {tab.label}
-          </a>
-        ))}
+        {TAB_IDS.map(tabId => {
+          const labelKey = tabId === 'info' ? 'tabInfo' : tabId === 'documentos' ? 'tabDocuments' : tabId === 'historial' ? 'tabHistory' : 'tabInvoices'
+          return (
+            <a
+              key={tabId}
+              href={`/contenedores/${container.id}?tab=${tabId}`}
+              className={`px-4 py-2.5 text-xs font-bold transition-colors border-b-2 -mb-px ${
+                activeTab === tabId
+                  ? 'border-[#0a1a3c] text-[#0a1a3c]'
+                  : 'border-transparent text-[#8a9aaa] hover:text-[#181c1e]'
+              }`}
+            >
+              {t(labelKey as any)}
+            </a>
+          )
+        })}
       </div>
 
       {/* Tab: Información */}
@@ -167,7 +165,7 @@ export default async function ContenedorDetallePage({
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('statusHistory')}</h2>
               <a href={`/contenedores/${container.id}?tab=historial`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">
-                Ver completo →
+                {t('viewAll')}
               </a>
             </div>
             {log.length === 0 ? (
@@ -285,7 +283,7 @@ export default async function ContenedorDetallePage({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[#f0f2f5]">
-                    {['Factura', 'Cliente', 'Descripción', 'Valor'].map(h => (
+                    {[t('invoiceNumber'), t('client'), t('description'), t('value')].map(h => (
                       <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                     ))}
                   </tr>

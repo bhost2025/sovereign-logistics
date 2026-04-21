@@ -1,13 +1,15 @@
 'use client'
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { uploadDocument } from '@/app/(app)/contenedores/[id]/documents/actions'
 import { DOCUMENT_CATEGORIES } from '@/lib/documents-config'
 
 export function UploadDocumentForm({ containerId }: { containerId: string }) {
-  const [open, setOpen]       = useState(false)
-  const [pending, setPending] = useState(false)
+  const [open, setOpen]         = useState(false)
+  const [pending, setPending]   = useState(false)
   const [fileName, setFileName] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
+  const t = useTranslations('documents')
 
   async function handleSubmit(formData: FormData) {
     setPending(true)
@@ -25,7 +27,7 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
         onClick={() => setOpen(o => !o)}
         className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-[#f7fafc] transition-colors"
       >
-        <span className="text-xs font-bold text-[#0a1a3c]">+ Subir Documento</span>
+        <span className="text-xs font-bold text-[#0a1a3c]">{t('upload')}</span>
         <span className="text-[#8a9aaa] text-sm">{open ? '▲' : '▼'}</span>
       </button>
 
@@ -40,14 +42,14 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
           {/* Category select */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-1.5">
-              Categoría
+              {t('category')}
             </label>
             <select
               name="category"
               required
               className="w-full text-xs font-semibold text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded-lg px-3 py-2 focus:outline-none focus:border-[#4A6FA5]"
             >
-              <option value="">Seleccionar categoría</option>
+              <option value="">{t('selectCategory')}</option>
               {DOCUMENT_CATEGORIES.map(cat => (
                 <option key={cat.slug} value={cat.slug}>
                   {cat.label}{cat.required ? ' *' : ''}
@@ -59,12 +61,12 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
           {/* File input */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-1.5">
-              Archivo
+              {t('file')}
             </label>
             <label className="flex items-center gap-3 w-full cursor-pointer bg-[#f7fafc] border border-dashed border-[#c5c6cf] rounded-lg px-4 py-3 hover:border-[#4A6FA5] transition-colors">
               <span className="text-[#4A6FA5] text-lg">↑</span>
               <span className="text-xs font-semibold text-[#6b7a8a]">
-                {fileName ?? 'Seleccionar archivo o arrastrar aquí'}
+                {fileName ?? t('dragOrSelect')}
               </span>
               <input
                 type="file"
@@ -81,12 +83,12 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
           {/* Comments */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-1.5">
-              Comentarios <span className="font-normal normal-case">(opcional)</span>
+              {t('comments')}
             </label>
             <textarea
               name="comments"
               rows={2}
-              placeholder="Notas sobre este documento..."
+              placeholder={t('comments') + '…'}
               className="w-full text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded-lg px-3 py-2 focus:outline-none focus:border-[#4A6FA5] resize-none"
             />
           </div>
@@ -97,14 +99,14 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
               disabled={pending}
               className="bg-[#0a1a3c] text-white text-xs font-bold px-5 py-2 rounded-md hover:bg-[#142a5c] transition-colors disabled:opacity-50"
             >
-              {pending ? 'Subiendo...' : 'Subir Documento'}
+              {pending ? t('uploading') : t('submit')}
             </button>
             <button
               type="button"
               onClick={() => { setOpen(false); setFileName(null) }}
               className="text-xs font-semibold text-[#8a9aaa] hover:text-[#181c1e] transition-colors"
             >
-              Cancelar
+              {t('cancel')}
             </button>
           </div>
         </form>

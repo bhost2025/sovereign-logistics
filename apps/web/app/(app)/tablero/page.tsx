@@ -8,10 +8,11 @@ const COLUMNS: ContainerStatus[] = [
 ]
 
 export default async function TableroPage() {
-  const [containers, t, tn] = await Promise.all([
+  const [containers, t, tn, tc] = await Promise.all([
     getContainersByStatus(),
     getTranslations('status'),
     getTranslations('nav'),
+    getTranslations('containers'),
   ])
 
   const byStatus = COLUMNS.reduce((acc, s) => {
@@ -104,7 +105,7 @@ export default async function TableroPage() {
                     )
                   })}
                   {cards.length === 0 && (
-                    <div className="text-center text-[10px] text-[#b0bac3] py-6">Sin contenedores</div>
+                    <div className="text-center text-[10px] text-[#b0bac3] py-6">{tc('emptyColumn')}</div>
                   )}
                 </div>
               </div>
