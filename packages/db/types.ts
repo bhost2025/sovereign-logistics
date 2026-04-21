@@ -82,6 +82,73 @@ export type Database = {
         }
         Relationships: []
       }
+      container_products: {
+        Row: {
+          id: string
+          container_id: string
+          client_id: string
+          company_id: string
+          invoice_id: string | null
+          sku: string | null
+          description: string
+          quantity: number
+          unit: string | null
+          declared_value: number | null
+          currency: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          container_id: string
+          client_id: string
+          company_id: string
+          invoice_id?: string | null
+          sku?: string | null
+          description: string
+          quantity?: number
+          unit?: string | null
+          declared_value?: number | null
+          currency?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          container_id?: string
+          client_id?: string
+          company_id?: string
+          invoice_id?: string | null
+          sku?: string | null
+          description?: string
+          quantity?: number
+          unit?: string | null
+          declared_value?: number | null
+          currency?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "container_products_container_id_fkey"
+            columns: ["container_id"]
+            isOneToOne: false
+            referencedRelation: "containers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "container_products_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "container_products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       container_documents: {
         Row: {
           id: string

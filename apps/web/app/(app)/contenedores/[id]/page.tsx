@@ -2,6 +2,7 @@ import { getContainerById } from '@/lib/containers'
 import { StatusBadge, STATUS_CONFIG } from '@/components/status-badge'
 import { ChangeStatusForm } from '@/components/change-status-form'
 import { DocumentsTab } from '@/components/documents-tab'
+import { LclClientPanel } from '@/components/lcl-client-panel'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
@@ -46,6 +47,7 @@ export default async function ContenedorDetallePage({
   const log      = container.container_status_log ?? []
   const clients  = container.container_clients ?? []
   const invoices = container.invoices ?? []
+  const products = (container as any).container_products ?? []
   const isLcl    = clients.length > 1
   const cfg      = STATUS_CONFIG[container.current_status]
   const lastUpdater = (container as any).last_updater?.full_name as string | undefined
@@ -123,7 +125,7 @@ export default async function ContenedorDetallePage({
               </div>
             </div>
 
-            {/* Clientes LCL */}
+            {/* Clientes LCL — interactivo */}
             <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
@@ -136,29 +138,13 @@ export default async function ContenedorDetallePage({
                   {t('addClient')}
                 </a>
               </div>
-              <div className="space-y-3">
-                {clients.map((cc, i) => (
-                  <div key={i} className="flex items-start justify-between gap-2">
-                    <div>
-                      <div className="text-xs font-bold text-[#181c1e]">{cc.clients?.name}</div>
-                      {cc.clients?.contact_name && (
-                        <div className="text-[10px] text-[#8a9aaa]">{cc.clients.contact_name}</div>
-                      )}
-                      {cc.clients?.email && (
-                        <div className="text-[10px] text-[#8a9aaa]">{cc.clients.email}</div>
-                      )}
-                    </div>
-                    {cc.share_pct != null && (
-                      <span className="text-[10px] font-bold bg-[#f0f2f5] text-[#556479] px-2 py-0.5 rounded shrink-0">
-                        {cc.share_pct}%
-                      </span>
-                    )}
-                  </div>
-                ))}
-                {clients.length === 0 && (
-                  <p className="text-[11px] text-[#b0bac3]">{t('noClients')}</p>
-                )}
-              </div>
+              <LclClientPanel
+                containerId={container.id}
+                clients={clients as any}
+                products={products}
+                invoices={invoices as any}
+                isLcl={isLcl}
+              />
             </div>
 
             {/* Notas */}

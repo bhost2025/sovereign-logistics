@@ -29,6 +29,9 @@ export async function getContainerById(id: string) {
         share_pct,
         clients(id, name, contact_name, email, phone)
       ),
+      container_products(
+        id, client_id, sku, description, quantity, unit, declared_value, currency, invoice_id
+      ),
       container_status_log(
         id, previous_status, new_status, notes, changed_at,
         users(full_name)

@@ -1,18 +1,6 @@
-import { getClientById } from '@/lib/clients'
+import { getClientById, getClientCargoSnapshot } from '@/lib/clients'
 import { StatusBadge } from '@/components/status-badge'
 import { notFound } from 'next/navigation'
-
-const STATUS_LABEL: Record<string, string> = {
-  pendiente:  'Pendiente',
-  pagada:     'Pagada',
-  cancelada:  'Cancelada',
-}
-
-const STATUS_COLOR: Record<string, string> = {
-  pendiente:  'bg-yellow-100 text-yellow-700',
-  pagada:     'bg-green-100 text-green-700',
-  cancelada:  'bg-red-100 text-red-600',
-}
 
 export default async function ClienteDetailPage({
   params,
@@ -20,14 +8,18 @@ export default async function ClienteDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const client = await getClientById(id).catch(() => null)
+  const [client, snapshot] = await Promise.all([
+    getClientById(id).catch(() => null),
+    getClientCargoSnapshot(id),
+  ])
   if (!client) notFound()
 
   const containers = client.container_clients?.map((cc: any) => cc.containers).filter(Boolean) ?? []
   const invoices   = (client.invoices as any[]) ?? []
 
   return (
-    <div className="p-8 max-w-[900px] space-y-8">
+    <div className="p-8 max-w-[960px] space-y-8">
+
       {/* Header */}
       <div>
         <a href="/clientes" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
@@ -45,19 +37,93 @@ export default async function ClienteDetailPage({
         </div>
       </div>
 
-      {/* Historial de Contenedores */}
+      {/* ─── Cargo Snapshot ─── */}
       <div>
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
-          Historial de Contenedores
+          Carga Activa
+        </h2>
+
+        {/* KPI strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+          {[
+            { label: 'En Tránsito',  value: snapshot.inTransit.length, symbol: '◈', color: '#4A6FA5', bg: '#eef2f8' },
+            { label: 'En Aduana',    value: snapshot.inCustoms.length, symbol: '◆', color: '#B8860B', bg: '#fdf8ec' },
+            { label: 'Entregados',   value: snapshot.delivered.length, symbol: '✓', color: '#1A7A8A', bg: '#edf6f7' },
+            { label: 'Total activo', value: snapshot.inTransit.length + snapshot.inCustoms.length, symbol: '◱', color: '#0a1a3c', bg: '#f0f2f5' },
+          ].map(kpi => (
+            <div key={kpi.label} className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
+              <div className="h-[3px]" style={{ background: kpi.color }} />
+              <div className="p-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#8a9aaa' }}>
+                  {kpi.symbol} {kpi.label}
+                </div>
+                <div className="text-2xl font-extrabold" style={{ color: kpi.color }}>{kpi.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Declared value */}
+        {snapshot.totalValue > 0 && (
+          <div className="bg-[#eef2f8] rounded-xl px-5 py-3 flex items-center justify-between mb-5">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#556479]">
+              ◱ Valor declarado total (facturas)
+            </span>
+            <span className="text-sm font-extrabold text-[#0a1a3c]">
+              USD {snapshot.totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+        )}
+
+        {/* Active containers table */}
+        {(snapshot.inTransit.length > 0 || snapshot.inCustoms.length > 0) ? (
+          <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-[#f0f2f5]">
+                  {['Contenedor', 'Ruta', 'ETA', 'Estado', ''].map(h => (
+                    <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...snapshot.inTransit, ...snapshot.inCustoms].map((c: any) => (
+                  <tr key={c.id} className="border-b border-[#f7fafc] hover:bg-[#f7fafc] transition-colors">
+                    <td className="px-5 py-3 font-mono font-bold text-[#0a1a3c] text-[11px]">{c.container_number}</td>
+                    <td className="px-5 py-3 text-[#6b7a8a]">{c.origin_port} → {c.destination_port}</td>
+                    <td className="px-5 py-3 text-[#6b7a8a]">
+                      {c.eta_date
+                        ? new Date(c.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+                        : '—'}
+                    </td>
+                    <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
+                    <td className="px-5 py-3">
+                      <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">Ver →</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] px-5 py-8 text-center">
+            <p className="text-2xl mb-2">✓</p>
+            <p className="text-xs text-[#b0bac3]">Sin carga activa en este momento.</p>
+          </div>
+        )}
+      </div>
+
+      {/* ─── Historial de Contenedores ─── */}
+      <div>
+        <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
+          Historial de Contenedores ({containers.length})
         </h2>
         <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-[#f0f2f5]">
                 {['Contenedor', 'Ruta', 'ETA', 'Estado', ''].map(h => (
-                  <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
-                    {h}
-                  </th>
+                  <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -73,9 +139,7 @@ export default async function ClienteDetailPage({
                   </td>
                   <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
                   <td className="px-5 py-3">
-                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">
-                      Ver →
-                    </a>
+                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">Ver →</a>
                   </td>
                 </tr>
               ))}
@@ -91,15 +155,14 @@ export default async function ClienteDetailPage({
         </div>
       </div>
 
-      {/* Facturas */}
+      {/* ─── Facturas ─── */}
       <div>
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
-          Facturas
+          Facturas ({invoices.length})
         </h2>
         <div className="space-y-4">
           {invoices.map((inv: any) => (
             <div key={inv.id} className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
-              {/* Factura header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f2f5]">
                 <div>
                   <span className="font-bold text-[#0a1a3c] text-sm">{inv.invoice_number}</span>
@@ -113,21 +176,23 @@ export default async function ClienteDetailPage({
                       {inv.currency} {Number(inv.declared_value).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                     </span>
                   )}
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${STATUS_COLOR[inv.status] ?? 'bg-gray-100 text-gray-600'}`}>
-                    {STATUS_LABEL[inv.status] ?? inv.status}
+                  {/* Status badge — deuteranopia-safe */}
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${
+                    inv.status === 'pagada'    ? 'bg-[#edf6f7] text-[#1A7A8A]' :
+                    inv.status === 'cancelada' ? 'bg-[#fef4ed] text-[#C05A00]' :
+                                                 'bg-[#fdf8ec] text-[#B8860B]'
+                  }`}>
+                    {inv.status === 'pagada' ? '✓ Pagada' : inv.status === 'cancelada' ? '✕ Cancelada' : '◆ Pendiente'}
                   </span>
                 </div>
               </div>
 
-              {/* Items */}
               {inv.invoice_items?.length > 0 && (
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-[#f0f2f5]">
                       {['Descripción', 'Cantidad', 'Unidad', 'Precio Unit.', 'Total'].map(h => (
-                        <th key={h} className="px-5 py-2 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
-                          {h}
-                        </th>
+                        <th key={h} className="px-5 py-2 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                       ))}
                     </tr>
                   </thead>
