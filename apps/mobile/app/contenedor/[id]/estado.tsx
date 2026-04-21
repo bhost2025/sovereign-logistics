@@ -28,14 +28,14 @@ export default function CambiarEstadoScreen() {
     const { data: { user } } = await supabase.auth.getUser()
     const { data: current } = await supabase.from('containers').select('current_status').eq('id', id).single()
 
-    await supabase.from('containers').update({ current_status: selected, updated_at: new Date().toISOString() }).eq('id', id)
+    await supabase.from('containers').update({ current_status: selected, updated_at: new Date().toISOString() } as any).eq('id', id)
     await supabase.from('container_status_log').insert({
       container_id: id,
       previous_status: current?.current_status ?? null,
       new_status: selected,
       changed_by: user?.id ?? null,
       notes: notes || null,
-    })
+    } as any)
 
     setSaving(false)
     router.back()
