@@ -2,6 +2,7 @@ import { getUserProfile } from '@/lib/auth/get-user-role'
 import { signOut } from '@/app/(auth)/login/actions'
 import { NextIntlClientProvider } from 'next-intl'
 import { setLocaleAction } from './admin/actions-locale'
+import { WorldClock } from '@/components/world-clock'
 import { cookies } from 'next/headers'
 import type { Locale } from '@/lib/i18n'
 
@@ -37,8 +38,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <aside className="w-[240px] shrink-0 bg-white/70 backdrop-blur-[30px] shadow-[2px_0_40px_rgba(24,28,30,0.04)] flex flex-col py-7">
+          {/* World Clock */}
+          <WorldClock />
+
           {/* Logo */}
-          <div className="px-6 pb-8 flex items-center gap-3">
+          <div className="px-6 pb-5 flex items-center gap-3">
             <div className="w-[34px] h-[34px] bg-[#0a1a3c] rounded-md flex items-center justify-center text-base font-bold text-white">S</div>
             <div>
               <div className="text-[13px] font-extrabold text-[#0a1a3c] tracking-tight leading-tight">Sovereign Logistics</div>
@@ -57,7 +61,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <a href="/contenedores" className="nav-item">◱ {nav.contenedores}</a>
             <a href="/clientes" className="nav-item">◎ {nav.clientes}</a>
             {profile.role === 'super_admin' && (
-              <a href="/admin" className="nav-item">⚙ {nav.admin}</a>
+              <a href="/settings" className="nav-item">⚙ {nav.settings ?? nav.admin}</a>
             )}
           </nav>
 

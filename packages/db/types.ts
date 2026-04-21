@@ -82,6 +82,60 @@ export type Database = {
         }
         Relationships: []
       }
+      ports: {
+        Row: {
+          id: string; company_id: string; name: string; country: string
+          code: string | null; type: string; active: boolean; created_at: string
+        }
+        Insert: {
+          id?: string; company_id: string; name: string; country: string
+          code?: string | null; type?: string; active?: boolean; created_at?: string
+        }
+        Update: {
+          id?: string; company_id?: string; name?: string; country?: string
+          code?: string | null; type?: string; active?: boolean; created_at?: string
+        }
+        Relationships: []
+      }
+      agencies: {
+        Row: {
+          id: string; company_id: string; name: string; type: string
+          contact_name: string | null; contact_email: string | null
+          contact_phone: string | null; notes: string | null
+          specialization: string | null; active: boolean; created_at: string
+        }
+        Insert: {
+          id?: string; company_id: string; name: string; type: string
+          contact_name?: string | null; contact_email?: string | null
+          contact_phone?: string | null; notes?: string | null
+          specialization?: string | null; active?: boolean; created_at?: string
+        }
+        Update: {
+          id?: string; company_id?: string; name?: string; type?: string
+          contact_name?: string | null; contact_email?: string | null
+          contact_phone?: string | null; notes?: string | null
+          specialization?: string | null; active?: boolean; created_at?: string
+        }
+        Relationships: []
+      }
+      notification_settings: {
+        Row: {
+          id: string; company_id: string; event_type: string
+          enabled: boolean; notify_roles: string[]
+          days_threshold: number | null; created_at: string
+        }
+        Insert: {
+          id?: string; company_id: string; event_type: string
+          enabled?: boolean; notify_roles?: string[]
+          days_threshold?: number | null; created_at?: string
+        }
+        Update: {
+          id?: string; company_id?: string; event_type?: string
+          enabled?: boolean; notify_roles?: string[]
+          days_threshold?: number | null; created_at?: string
+        }
+        Relationships: []
+      }
       container_products: {
         Row: {
           id: string
