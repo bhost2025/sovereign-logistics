@@ -55,7 +55,7 @@ export async function updateContainerStatus(containerId: string, newStatus: Cont
     .from('containers').select('current_status').eq('id', containerId).single()
 
   await supabase.from('containers')
-    .update({ current_status: newStatus, updated_at: new Date().toISOString() })
+    .update({ current_status: newStatus, updated_at: new Date().toISOString(), last_updated_by: profile?.id ?? null })
     .eq('id', containerId)
 
   await supabase.from('container_status_log').insert({

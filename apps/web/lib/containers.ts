@@ -24,6 +24,7 @@ export async function getContainerById(id: string) {
     .from('containers')
     .select(`
       *,
+      last_updater:last_updated_by(full_name),
       container_clients(
         share_pct,
         clients(id, name, contact_name, email, phone)

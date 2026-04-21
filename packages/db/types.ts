@@ -82,6 +82,83 @@ export type Database = {
         }
         Relationships: []
       }
+      container_documents: {
+        Row: {
+          id: string
+          container_id: string
+          company_id: string
+          category: string
+          file_name: string
+          file_url: string
+          doc_status: Database["public"]["Enums"]["doc_status"]
+          comments: string | null
+          uploaded_by: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          container_id: string
+          company_id: string
+          category: string
+          file_name: string
+          file_url: string
+          doc_status?: Database["public"]["Enums"]["doc_status"]
+          comments?: string | null
+          uploaded_by?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          container_id?: string
+          company_id?: string
+          category?: string
+          file_name?: string
+          file_url?: string
+          doc_status?: Database["public"]["Enums"]["doc_status"]
+          comments?: string | null
+          uploaded_by?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "container_documents_container_id_fkey"
+            columns: ["container_id"]
+            isOneToOne: false
+            referencedRelation: "containers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "container_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "container_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "container_documents_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       container_clients: {
         Row: {
           client_id: string
@@ -185,6 +262,7 @@ export type Database = {
           destination_port: string
           eta_date: string | null
           id: string
+          last_updated_by: string | null
           notes: string | null
           origin_port: string
           updated_at: string
@@ -201,6 +279,7 @@ export type Database = {
           destination_port?: string
           eta_date?: string | null
           id?: string
+          last_updated_by?: string | null
           notes?: string | null
           origin_port: string
           updated_at?: string
@@ -217,6 +296,7 @@ export type Database = {
           destination_port?: string
           eta_date?: string | null
           id?: string
+          last_updated_by?: string | null
           notes?: string | null
           origin_port?: string
           updated_at?: string
@@ -232,6 +312,13 @@ export type Database = {
           {
             foreignKeyName: "containers_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "containers_last_updated_by_fkey"
+            columns: ["last_updated_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -349,6 +436,7 @@ export type Database = {
         | "detenido_aduana"
         | "transito_terrestre"
         | "entregado"
+      doc_status: "uploaded" | "pending_review" | "approved" | "rejected"
       user_role: "super_admin" | "operator" | "director" | "client_viewer"
     }
     CompositeTypes: {

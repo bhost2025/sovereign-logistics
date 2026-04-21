@@ -26,8 +26,13 @@ export default async function DashboardPage() {
   ])
 
   const detenidos = containers.filter(c => c.current_status === 'detenido_aduana')
+  const sinActualizar = containers.filter(c => {
+    const diff = Date.now() - new Date(c.updated_at).getTime()
+    return diff > 5 * 86400000 && c.current_status !== 'entregado' // +5 días sin mover
+  })
   const totalFacturado = Object.values(stats.invoiceStats as Record<string, { count: number; total: number }>)
     .reduce((sum, s) => sum + s.total, 0)
+  const totalAlertas = detenidos.length + sinActualizar.length
 
   return (
     <div className="p-8 max-w-[1200px] space-y-8">
@@ -202,25 +207,51 @@ export default async function DashboardPage() {
         <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#f0f2f5] flex items-center justify-between">
             <h2 className="text-sm font-extrabold text-[#0a1a3c]">▲ {t('alerts')}</h2>
-            {detenidos.length > 0 && (
+            {totalAlertas > 0 && (
               <span className="text-[10px] font-bold bg-[#fef4ed] text-[#C05A00] px-2 py-0.5 rounded">
-                {detenidos.length} detenido{detenidos.length > 1 ? 's' : ''}
+                {totalAlertas} alerta{totalAlertas > 1 ? 's' : ''}
               </span>
             )}
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-3 max-h-[420px] overflow-y-auto">
             {detenidos.map(c => {
               const clientName = c.container_clients?.[0]?.clients?.name ?? '—'
               return (
-                <div key={c.id} className="p-3 rounded-lg bg-[#fef4ed] border-l-[3px] border-[#C05A00]">
-                  <div className="font-mono font-bold text-[11px] text-[#0a1a3c]">{c.container_number}</div>
+                <a
+                  key={c.id}
+                  href={`/contenedores/${c.id}`}
+                  className="block p-3 rounded-lg bg-[#fef4ed] border-l-[3px] border-[#C05A00] hover:bg-[#fdeee3] transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-mono font-bold text-[11px] text-[#0a1a3c]">{c.container_number}</div>
+                    <span className="text-[9px] font-bold text-[#C05A00] bg-[#fdeee3] px-1.5 py-0.5 rounded">▲ Crítico</span>
+                  </div>
                   <div className="text-[10px] text-[#6b7a8a] mt-0.5">{clientName}</div>
                   <div className="text-[10px] text-[#C05A00] font-semibold mt-0.5">{t('detainedCustoms')}</div>
                   <div className="text-[10px] text-[#8a9aaa]">{c.origin_port} → {c.destination_port}</div>
-                </div>
+                </a>
               )
             })}
-            {detenidos.length === 0 && (
+            {sinActualizar.map(c => {
+              const clientName = c.container_clients?.[0]?.clients?.name ?? '—'
+              const days = Math.floor((Date.now() - new Date(c.updated_at).getTime()) / 86400000)
+              return (
+                <a
+                  key={`stale-${c.id}`}
+                  href={`/contenedores/${c.id}`}
+                  className="block p-3 rounded-lg bg-[#fdf8ec] border-l-[3px] border-[#B8860B] hover:bg-[#faf3e0] transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-mono font-bold text-[11px] text-[#0a1a3c]">{c.container_number}</div>
+                    <span className="text-[9px] font-bold text-[#B8860B] bg-[#fdf8ec] px-1.5 py-0.5 rounded">◆ Advertencia</span>
+                  </div>
+                  <div className="text-[10px] text-[#6b7a8a] mt-0.5">{clientName}</div>
+                  <div className="text-[10px] text-[#B8860B] font-semibold mt-0.5">Sin actualizar hace {days} días</div>
+                  <div className="text-[10px] text-[#8a9aaa]">{c.origin_port} → {c.destination_port}</div>
+                </a>
+              )
+            })}
+            {totalAlertas === 0 && (
               <div className="text-center py-8">
                 <p className="text-2xl mb-2">✓</p>
                 <p className="text-[11px] text-[#b0bac3]">{t('noAlerts')}</p>
