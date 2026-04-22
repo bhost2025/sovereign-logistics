@@ -80,7 +80,12 @@
     "backToContainer": "← Volver al contenedor",
     "selectClient": "— Selecciona un cliente —",
     "sharePercent": "% Participación en el contenedor",
-    "shareNote": "Opcional. Indica qué porcentaje del contenedor ocupa este cliente."
+    "shareNote": "Opcional. Indica qué porcentaje del contenedor ocupa este cliente.",
+    "editTitle": "Editar Contenedor",
+    "editBtn": "Guardar Cambios",
+    "archiveBtn": "Archivar",
+    "deleteConfirm": "¿Archivar este contenedor? Podrás restaurarlo después.",
+    "errorEdit": "Error al guardar. Verifica los datos."
   },
   "documents": {
     "title": "Documentos",
@@ -184,7 +189,12 @@
     "contactName": "Nombre de Contacto",
     "registerClient": "Registrar Cliente",
     "errorSave": "Error al guardar. Verifica los datos e intenta de nuevo.",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "editTitle": "Editar Cliente",
+    "editBtn": "Guardar Cambios",
+    "deleteClient": "Eliminar",
+    "deleteConfirm": "¿Eliminar este cliente? Esta acción no se puede deshacer.",
+    "hasContainers": "No se puede eliminar: tiene {count} contenedor(es) activo(s)."
   },
   "dashboard": {
     "title": "Dashboard Ejecutivo",

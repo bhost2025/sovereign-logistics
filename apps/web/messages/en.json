@@ -80,7 +80,12 @@
     "backToContainer": "← Back to container",
     "selectClient": "— Select a client —",
     "sharePercent": "% Container share",
-    "shareNote": "Optional. Percentage of the container this client occupies."
+    "shareNote": "Optional. Percentage of the container this client occupies.",
+    "editTitle": "Edit Container",
+    "editBtn": "Save Changes",
+    "archiveBtn": "Archive",
+    "deleteConfirm": "Archive this container? You can restore it later.",
+    "errorEdit": "Save error. Check the data."
   },
   "documents": {
     "title": "Documents",
@@ -184,7 +189,12 @@
     "contactName": "Contact Name",
     "registerClient": "Register Client",
     "errorSave": "Save error. Check the data and try again.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "editTitle": "Edit Client",
+    "editBtn": "Save Changes",
+    "deleteClient": "Delete",
+    "deleteConfirm": "Delete this client? This action cannot be undone.",
+    "hasContainers": "Cannot delete: {count} active container(s) linked."
   },
   "dashboard": {
     "title": "Executive Dashboard",

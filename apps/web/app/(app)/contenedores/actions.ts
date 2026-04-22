@@ -1,6 +1,9 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { getUserProfile } from '@/lib/auth/get-user-role'
+import { requireCan } from '@/lib/auth/can'
+import { writeLog, diffObjects } from '@/lib/audit'
+import { dispatchNotification } from '@/lib/notifications'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import type { Database } from '@sovereign/db'
@@ -8,13 +11,9 @@ import type { Database } from '@sovereign/db'
 type ContainerStatus = Database['public']['Enums']['container_status']
 
 export async function createContainer(formData: FormData) {
+  await requireCan('create_containers')
+  const profile = await getUserProfile()
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const { data: profile } = await supabase
-    .from('users').select('company_id, id').eq('id', user.id).single()
-  if (!profile) redirect('/login')
 
   const { data, error } = await supabase.from('containers').insert({
     company_id:       profile.company_id,
@@ -26,7 +25,7 @@ export async function createContainer(formData: FormData) {
     eta_date:         (formData.get('eta_date') as string) || null,
     notes:            (formData.get('notes') as string)?.trim() || null,
     created_by:       profile.id,
-  }).select('id').single()
+  }).select('id, container_number').single()
 
   if (error) redirect('/contenedores/nuevo?error=1')
 
@@ -38,32 +37,55 @@ export async function createContainer(formData: FormData) {
     notes:           'Contenedor registrado',
   })
 
+  await writeLog({
+    action:       'create',
+    entity_type:  'container',
+    entity_id:    data.id,
+    entity_label: data.container_number,
+  })
+
   revalidatePath('/tablero')
   revalidatePath('/contenedores')
   redirect(`/contenedores/${data.id}`)
 }
 
-export async function updateContainerStatus(containerId: string, newStatus: ContainerStatus, notes: string) {
+export async function updateContainer(containerId: string, formData: FormData) {
+  await requireCan('edit_containers')
+  const profile = await getUserProfile()
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('users').select('id').eq('id', user.id).single()
+  // Snapshot before
+  const { data: before } = await supabase
+    .from('containers')
+    .select('container_number,bl_number,origin_port,destination_port,departure_date,eta_date,arrival_date,notes,current_status')
+    .eq('id', containerId)
+    .single()
 
-  const { data: current } = await supabase
-    .from('containers').select('current_status').eq('id', containerId).single()
+  const payload = {
+    bl_number:        (formData.get('bl_number') as string)?.trim() || null,
+    origin_port:      (formData.get('origin_port') as string).trim(),
+    destination_port: (formData.get('destination_port') as string).trim(),
+    departure_date:   (formData.get('departure_date') as string) || null,
+    eta_date:         (formData.get('eta_date') as string) || null,
+    arrival_date:     (formData.get('arrival_date') as string) || null,
+    notes:            (formData.get('notes') as string)?.trim() || null,
+    updated_at:       new Date().toISOString(),
+    last_updated_by:  profile.id,
+  }
 
-  await supabase.from('containers')
-    .update({ current_status: newStatus, updated_at: new Date().toISOString(), last_updated_by: profile?.id ?? null })
+  const { error } = await supabase
+    .from('containers')
+    .update(payload)
     .eq('id', containerId)
 
-  await supabase.from('container_status_log').insert({
-    container_id:    containerId,
-    previous_status: current?.current_status ?? null,
-    new_status:      newStatus,
-    changed_by:      profile?.id ?? null,
-    notes:           notes || null,
+  if (error) redirect(`/contenedores/${containerId}/editar?error=1`)
+
+  await writeLog({
+    action:       'update',
+    entity_type:  'container',
+    entity_id:    containerId,
+    entity_label: before?.container_number ?? containerId,
+    changes:      diffObjects(before as any ?? {}, payload as any),
   })
 
   revalidatePath(`/contenedores/${containerId}`)
@@ -71,9 +93,120 @@ export async function updateContainerStatus(containerId: string, newStatus: Cont
   redirect(`/contenedores/${containerId}`)
 }
 
-export async function addClientToContainer(formData: FormData) {
-  const supabase = await createClient()
+export async function softDeleteContainer(containerId: string) {
+  await requireCan('delete_containers')
   const profile = await getUserProfile()
+  const supabase = await createClient()
+
+  const { data: container } = await supabase
+    .from('containers')
+    .select('container_number')
+    .eq('id', containerId)
+    .single()
+
+  await (supabase as any)
+    .from('containers')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', containerId)
+
+  await writeLog({
+    action:       'delete',
+    entity_type:  'container',
+    entity_id:    containerId,
+    entity_label: container?.container_number ?? containerId,
+  })
+
+  revalidatePath('/tablero')
+  revalidatePath('/contenedores')
+  redirect('/contenedores')
+}
+
+export async function restoreContainer(containerId: string) {
+  await requireCan('delete_containers')
+  const supabase = await createClient()
+
+  const { data: container } = await (supabase as any)
+    .from('containers')
+    .select('container_number')
+    .eq('id', containerId)
+    .single()
+
+  await (supabase as any)
+    .from('containers')
+    .update({ deleted_at: null })
+    .eq('id', containerId)
+
+  await writeLog({
+    action:       'restore',
+    entity_type:  'container',
+    entity_id:    containerId,
+    entity_label: container?.container_number ?? containerId,
+  })
+
+  revalidatePath(`/contenedores/${containerId}`)
+  redirect(`/contenedores/${containerId}`)
+}
+
+export async function updateContainerStatus(
+  containerId: string,
+  newStatus: ContainerStatus,
+  notes: string,
+) {
+  await requireCan('edit_containers')
+  const profile = await getUserProfile()
+  const supabase = await createClient()
+
+  const { data: current } = await supabase
+    .from('containers')
+    .select('current_status, container_number, eta_date')
+    .eq('id', containerId)
+    .single()
+
+  await supabase.from('containers').update({
+    current_status:  newStatus,
+    updated_at:      new Date().toISOString(),
+    last_updated_by: profile.id,
+  }).eq('id', containerId)
+
+  await supabase.from('container_status_log').insert({
+    container_id:    containerId,
+    previous_status: current?.current_status ?? null,
+    new_status:      newStatus,
+    changed_by:      profile.id,
+    notes:           notes || null,
+  })
+
+  await writeLog({
+    action:       'update',
+    entity_type:  'container',
+    entity_id:    containerId,
+    entity_label: current?.container_number ?? containerId,
+    changes: {
+      current_status: {
+        before: current?.current_status,
+        after:  newStatus,
+      },
+    },
+  })
+
+  // Dispatch email notification if status is critical
+  if (newStatus === 'detenido_aduana') {
+    await dispatchNotification('container_detained', {
+      containerId,
+      containerNumber: current?.container_number ?? containerId,
+      status: newStatus,
+      companyId: profile.company_id,
+    })
+  }
+
+  revalidatePath(`/contenedores/${containerId}`)
+  revalidatePath('/tablero')
+  redirect(`/contenedores/${containerId}`)
+}
+
+export async function addClientToContainer(formData: FormData) {
+  await requireCan('edit_containers')
+  const supabase = await createClient()
 
   const containerId = formData.get('container_id') as string
   const clientId    = formData.get('client_id') as string
@@ -86,12 +219,21 @@ export async function addClientToContainer(formData: FormData) {
   })
 
   if (error) redirect(`/contenedores/${containerId}/agregar-cliente?error=1`)
+
+  await writeLog({
+    action:       'update',
+    entity_type:  'container',
+    entity_id:    containerId,
+    entity_label: containerId,
+    changes: { client_added: { before: null, after: clientId } },
+  })
+
   revalidatePath(`/contenedores/${containerId}`)
   redirect(`/contenedores/${containerId}`)
 }
 
 export async function createInvoiceAction(formData: FormData) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await requireCan('create_invoices')
   const supabase = await createClient() as any
   const profile = await getUserProfile()
 
@@ -104,20 +246,12 @@ export async function createInvoiceAction(formData: FormData) {
 
   const { data: invoice, error } = await supabase
     .from('invoices')
-    .insert({
-      container_id:   containerId,
-      client_id:      clientId,
-      invoice_number: invoiceNumber,
-      currency,
-      declared_value: declaredValue,
-      description,
-    })
+    .insert({ container_id: containerId, client_id: clientId, invoice_number: invoiceNumber, currency, declared_value: declaredValue, description })
     .select('id')
     .single()
 
   if (error) redirect(`/contenedores/${containerId}/facturas/nueva?error=1`)
 
-  // Insert items
   const count = Number(formData.get('items_count') ?? 0)
   const items: any[] = []
   for (let i = 0; i < count; i++) {
@@ -127,9 +261,15 @@ export async function createInvoiceAction(formData: FormData) {
     const price = Number(formData.get(`items[${i}][unit_price]`))
     if (desc) items.push({ invoice_id: invoice.id, description: desc, quantity: qty || 1, unit, unit_price: price || 0 })
   }
-  if (items.length > 0) {
-    await supabase.from('invoice_items').insert(items)
-  }
+  if (items.length > 0) await supabase.from('invoice_items').insert(items)
+
+  await writeLog({
+    action:       'create',
+    entity_type:  'invoice',
+    entity_id:    invoice.id,
+    entity_label: invoiceNumber,
+    changes: { container_id: { before: null, after: containerId } },
+  })
 
   revalidatePath(`/contenedores/${containerId}`)
   redirect(`/contenedores/${containerId}`)

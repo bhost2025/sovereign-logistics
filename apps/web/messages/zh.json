@@ -80,7 +80,12 @@
     "backToContainer": "← 返回集装箱",
     "selectClient": "— 选择客户 —",
     "sharePercent": "% 货柜份额",
-    "shareNote": "可选，填写该客户占用货柜的百分比。"
+    "shareNote": "可选，填写该客户占用货柜的百分比。",
+    "editTitle": "编辑货柜",
+    "editBtn": "保存更改",
+    "archiveBtn": "归档",
+    "deleteConfirm": "归档此货柜？稍后可以恢复。",
+    "errorEdit": "保存出错，请检查数据。"
   },
   "documents": {
     "title": "单据文件",
@@ -184,7 +189,12 @@
     "contactName": "联系人姓名",
     "registerClient": "注册客户",
     "errorSave": "保存出错，请检查数据后重试。",
-    "cancel": "取消"
+    "cancel": "取消",
+    "editTitle": "编辑客户",
+    "editBtn": "保存更改",
+    "deleteClient": "删除",
+    "deleteConfirm": "删除此客户？此操作无法撤销。",
+    "hasContainers": "无法删除：该客户有 {count} 个关联货柜。"
   },
   "dashboard": {
     "title": "管理仪表板",

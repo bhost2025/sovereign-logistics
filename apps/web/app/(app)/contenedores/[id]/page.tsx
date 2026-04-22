@@ -5,6 +5,8 @@ import { DocumentsTab } from '@/components/documents-tab'
 import { LclClientPanel } from '@/components/lcl-client-panel'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
+import { can } from '@/lib/auth/can'
+import { softDeleteContainer } from '../actions'
 
 type Tab = 'info' | 'documentos' | 'historial' | 'facturas'
 const TAB_IDS: Tab[] = ['info', 'documentos', 'historial', 'facturas']
@@ -39,11 +41,13 @@ export default async function ContenedorDetallePage({
 
   const activeTab: Tab = (TAB_IDS.find(id => id === tabParam) as Tab | undefined) ?? 'info'
 
-  const [container, t, ts, locale] = await Promise.all([
+  const [container, t, ts, locale, canEdit, canDelete] = await Promise.all([
     getContainerById(id).catch(() => null),
     getTranslations('containers'),
     getTranslations('status'),
     getLocale(),
+    can('edit_containers'),
+    can('delete_containers'),
   ])
   if (!container) notFound()
 
@@ -84,6 +88,26 @@ export default async function ContenedorDetallePage({
             <span className="text-xs font-bold bg-sky-100 text-sky-700 px-2.5 py-1 rounded">LCL</span>
           )}
           <StatusBadge status={container.current_status} label={ts(container.current_status as any)} />
+          {canEdit && (
+            <a
+              href={`/contenedores/${container.id}/editar`}
+              className="text-xs font-bold text-[#4A6FA5] border border-[#4A6FA5] px-3 py-1.5 rounded-lg hover:bg-[#eef2f8] transition-colors"
+            >
+              ◈ {t('editBtn')}
+            </a>
+          )}
+          {canDelete && (
+            <form action={softDeleteContainer.bind(null, container.id)} onSubmit={(e) => {
+              if (!confirm(t('deleteConfirm'))) e.preventDefault()
+            }}>
+              <button
+                type="submit"
+                className="text-xs font-bold text-[#C05A00] border border-[#C05A00] px-3 py-1.5 rounded-lg hover:bg-[#fef4ed] transition-colors"
+              >
+                ▲ {t('archiveBtn')}
+              </button>
+            </form>
+          )}
         </div>
       </div>
 

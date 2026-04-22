@@ -2,20 +2,28 @@ import { getClientById, getClientCargoSnapshot } from '@/lib/clients'
 import { StatusBadge } from '@/components/status-badge'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
+import { can } from '@/lib/auth/can'
+import { deleteClientAction } from '../actions'
 
 export default async function ClienteDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ error?: string; count?: string }>
 }) {
   const { id } = await params
-  const [client, snapshot, tc, tg, ti, locale] = await Promise.all([
+  const sp = await searchParams
+  const [client, snapshot, tc, tg, ti, tk, locale, canEdit, canDelete] = await Promise.all([
     getClientById(id).catch(() => null),
     getClientCargoSnapshot(id),
     getTranslations('cargo'),
     getTranslations('containers'),
     getTranslations('invoices'),
+    getTranslations('clients'),
     getLocale(),
+    can('edit_clients'),
+    can('delete_clients'),
   ])
   const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
   if (!client) notFound()
@@ -33,6 +41,13 @@ export default async function ClienteDetailPage({
         <a href="/clientes" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
           {tg('backToClients')}
         </a>
+
+        {sp.error === 'has_containers' && (
+          <div className="mt-3 p-3 rounded-lg bg-[#fef4ed] border-l-[3px] border-[#C05A00] text-[#C05A00] text-xs font-bold">
+            ▲ {tk('hasContainers', { count: sp.count ?? '?' })}
+          </div>
+        )}
+
         <div className="flex items-start justify-between mt-2">
           <div>
             <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight">{client.name}</h1>
@@ -41,6 +56,26 @@ export default async function ClienteDetailPage({
               {client.email && <span>{client.email} · </span>}
               {client.phone && <span>{client.phone}</span>}
             </p>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            {canEdit && (
+              <a
+                href={`/clientes/${id}/editar`}
+                className="text-[11px] font-bold px-3 py-1.5 rounded-md border border-[#c5c6cf] text-[#556479] hover:border-[#0a1a3c] hover:text-[#0a1a3c] transition-colors"
+              >
+                ◈ {tk('editBtn')}
+              </a>
+            )}
+            {canDelete && (
+              <form action={deleteClientAction.bind(null, id)}>
+                <button
+                  type="submit"
+                  className="text-[11px] font-bold px-3 py-1.5 rounded-md border border-[#e8c5b0] text-[#C05A00] hover:bg-[#fef4ed] transition-colors"
+                >
+                  ▲ {tk('deleteClient')}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
