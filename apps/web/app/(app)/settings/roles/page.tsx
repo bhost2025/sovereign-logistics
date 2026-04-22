@@ -1,98 +1,92 @@
+import { createClient } from '@/lib/supabase/server'
+import { getUserProfile } from '@/lib/auth/get-user-role'
 import { getTranslations } from 'next-intl/server'
+import { RolesEditor } from './roles-editor'
 
-const PERMISSION_KEYS = [
-  { key: 'viewContainers',   director: true,  operator: true,  operatorCn: true,  admin: true  },
-  { key: 'editContainers',   director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'createContainers', director: false, operator: true,  operatorCn: false, admin: true  },
-  { key: 'uploadDocs',       director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'approveDocs',      director: true,  operator: false, operatorCn: false, admin: true  },
-  { key: 'createAlerts',     director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'resolveAlerts',    director: true,  operator: true,  operatorCn: false, admin: true  },
-  { key: 'exportData',       director: true,  operator: false, operatorCn: false, admin: true  },
-  { key: 'manageClients',    director: true,  operator: true,  operatorCn: false, admin: true  },
-  { key: 'manageSettings',   director: false, operator: false, operatorCn: false, admin: true  },
+export const dynamic = 'force-dynamic'
+
+export const ROLES = [
+  { key: 'director',    color: '#B8860B', bg: '#fdf8ec' },
+  { key: 'operator',    color: '#4A6FA5', bg: '#eef2f8' },
+  { key: 'operator_cn', color: '#1A7A8A', bg: '#edf6f7' },
+  { key: 'super_admin', color: '#0a1a3c', bg: '#f0f2f5' },
 ]
 
-const ROLE_COLORS = [
-  { key: 'director',   color: '#B8860B', bg: '#fdf8ec' },
-  { key: 'operator',   color: '#4A6FA5', bg: '#eef2f8' },
-  { key: 'operatorCn', color: '#1A7A8A', bg: '#edf6f7' },
-  { key: 'admin',      color: '#0a1a3c', bg: '#f0f2f5' },
+export const PERMISSION_GROUPS: { group: string; keys: string[] }[] = [
+  { group: 'Contenedores', keys: ['view_containers','create_containers','edit_containers','delete_containers'] },
+  { group: 'Clientes',     keys: ['view_clients','create_clients','edit_clients','delete_clients'] },
+  { group: 'Documentos',   keys: ['upload_documents','approve_documents','delete_documents'] },
+  { group: 'Facturas',     keys: ['view_invoices','create_invoices','delete_invoices'] },
+  { group: 'Operaciones',  keys: ['create_alerts','resolve_alerts','export_data'] },
+  { group: 'Configuración',keys: ['manage_clients','manage_settings','manage_users','manage_roles','manage_ports','manage_agencies','manage_notifications','manage_email'] },
+  { group: 'Sistema',      keys: ['view_logs','run_backup','run_cleanup'] },
 ]
 
-function Cell({ granted }: { granted: boolean }) {
-  return (
-    <td className="px-5 py-3 text-center">
-      {granted
-        ? <span className="text-[#1A7A8A] text-sm font-bold">✓</span>
-        : <span className="text-[#d0d5db] text-sm">—</span>
-      }
-    </td>
-  )
+function permKey(db: string): string {
+  return db.replace(/_([a-z])/g, (_, l) => l.toUpperCase())
 }
 
-export default async function SettingsRolesPage() {
-  const [t] = await Promise.all([
+export default async function SettingsRolesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string; saved?: string }>
+}) {
+  const [params, profile, t] = await Promise.all([
+    searchParams,
+    getUserProfile(),
     getTranslations('settings'),
   ])
 
-  const ROLES = [
-    { key: 'director',   label: t('permMatrix.director'),   color: '#B8860B', bg: '#fdf8ec' },
-    { key: 'operator',   label: t('permMatrix.operator'),   color: '#4A6FA5', bg: '#eef2f8' },
-    { key: 'operatorCn', label: t('permMatrix.operatorCn'), color: '#1A7A8A', bg: '#edf6f7' },
-    { key: 'admin',      label: t('permMatrix.admin'),      color: '#0a1a3c', bg: '#f0f2f5' },
-  ]
+  const activeRole = params.role ?? 'director'
+
+  const supabase = await createClient()
+  const { data: rows } = await supabase
+    .from('role_permissions')
+    .select('role, permission, granted')
+    .eq('company_id', profile.company_id) as any
+
+  const permMap: Record<string, Record<string, boolean>> = {}
+  for (const r of ROLES) permMap[r.key] = {}
+  for (const row of rows ?? []) {
+    if (!permMap[row.role]) permMap[row.role] = {}
+    permMap[row.role][row.permission] = row.granted
+  }
+
+  const ROLE_LABELS: Record<string, string> = {
+    director:    t('permMatrix.director'),
+    operator:    t('permMatrix.operator'),
+    operator_cn: t('permMatrix.operatorCn'),
+    super_admin: t('permMatrix.admin'),
+  }
+
+  const allPermKeys = PERMISSION_GROUPS.flatMap(g => g.keys)
+  const permLabels = Object.fromEntries(
+    allPermKeys.map(k => [k, t(`permMatrix.${permKey(k)}` as any)])
+  )
 
   return (
-    <div className="p-8 max-w-[860px]">
+    <div className="p-8 max-w-[760px]">
       <div className="mb-8">
         <h1 className="text-xl font-extrabold text-[#0a1a3c] tracking-tight">{t('roles')}</h1>
-        <p className="text-[11px] text-[#8a9aaa] mt-0.5">{t('rolesSubtitle')}</p>
+        <p className="text-[11px] text-[#8a9aaa] mt-0.5">{t('rolesEditSubtitle')}</p>
       </div>
 
-      {/* Role cards */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {ROLES.map(r => (
-          <div key={r.key} className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
-            <div className="h-[3px]" style={{ background: r.color }} />
-            <div className="p-4">
-              <div className="text-xs font-extrabold" style={{ color: r.color }}>{r.label}</div>
-              <div className="text-[9px] text-[#8a9aaa] mt-0.5 capitalize">{r.key}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Permission matrix */}
-      <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-[#f0f2f5]">
-              <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] w-[280px]">
-                {t('permMatrix.permission')}
-              </th>
-              {ROLES.map(r => (
-                <th key={r.key} className="px-5 py-3 text-center text-[10px] font-bold uppercase tracking-widest" style={{ color: r.color }}>
-                  {r.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {PERMISSION_KEYS.map((p, i) => (
-              <tr key={p.key} className={`border-b border-[#f7fafc] ${i % 2 === 0 ? '' : 'bg-[#fafbfc]'}`}>
-                <td className="px-5 py-3 font-semibold text-[#181c1e]">{t(`permMatrix.${p.key}` as any)}</td>
-                <Cell granted={p.director} />
-                <Cell granted={p.operator} />
-                <Cell granted={p.operatorCn} />
-                <Cell granted={p.admin} />
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <p className="text-[10px] text-[#b0bac3] mt-4">◎ {t('noteRoles')}</p>
+      <RolesEditor
+        roles={ROLES}
+        activeRole={activeRole}
+        permMap={permMap}
+        permissionGroups={PERMISSION_GROUPS}
+        permLabels={permLabels}
+        roleLabels={ROLE_LABELS}
+        saved={params.saved === '1'}
+        labels={{
+          save:      t('save'),
+          saving:    t('saving'),
+          permSaved: t('permSaved'),
+          noteRoles: t('noteRoles'),
+          permission: t('permMatrix.permission'),
+        }}
+      />
     </div>
   )
 }

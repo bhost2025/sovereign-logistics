@@ -10,13 +10,21 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   if (profile.role !== 'super_admin') redirect('/tablero')
 
   const SUB_NAV = [
-    { href: '/settings/users',         label: t('users'),         icon: '◎' },
-    { href: '/settings/roles',         label: t('roles'),         icon: '◈' },
-    { href: '/settings/statuses',      label: t('statuses'),      icon: '◆' },
-    { href: '/settings/ports',         label: t('ports'),         icon: '◱' },
-    { href: '/settings/agencies',      label: t('agencies'),      icon: '▶' },
-    { href: '/settings/notifications', label: t('notifications'), icon: '◎' },
+    { href: '/settings/users',         label: t('users'),         icon: '◎', group: 'main' },
+    { href: '/settings/roles',         label: t('roles'),         icon: '◈', group: 'main' },
+    { href: '/settings/statuses',      label: t('statuses'),      icon: '◆', group: 'main' },
+    { href: '/settings/ports',         label: t('ports'),         icon: '◱', group: 'main' },
+    { href: '/settings/agencies',      label: t('agencies'),      icon: '▶', group: 'main' },
+    { href: '/settings/notifications', label: t('notifications'), icon: '◎', group: 'main' },
+    { href: '/settings/email',         label: t('email'),         icon: '✉', group: 'system' },
+    { href: '/settings/logs',          label: t('logs'),          icon: '◈', group: 'system' },
+    { href: '/settings/backups',       label: t('backups'),       icon: '◆', group: 'system' },
+    { href: '/settings/cleanup',       label: t('cleanup'),       icon: '▲', group: 'danger' },
   ]
+
+  const mainNav   = SUB_NAV.filter(i => i.group === 'main')
+  const systemNav = SUB_NAV.filter(i => i.group === 'system')
+  const dangerNav = SUB_NAV.filter(i => i.group === 'danger')
 
   return (
     <div className="flex min-h-screen">
@@ -26,11 +34,41 @@ export default async function SettingsLayout({ children }: { children: React.Rea
           <div className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">⚙ {t('title')}</div>
         </div>
         <nav className="px-2 space-y-0.5">
-          {SUB_NAV.map(item => (
+          {mainNav.map(item => (
             <a
               key={item.href}
               href={item.href}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#556479] hover:bg-[#f0f2f5] hover:text-[#0a1a3c] transition-colors"
+            >
+              <span className="text-[10px]">{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
+
+          <div className="pt-3 pb-1 px-3">
+            <div className="text-[9px] font-bold uppercase tracking-widest text-[#c5c6cf]">Sistema</div>
+          </div>
+
+          {systemNav.map(item => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#556479] hover:bg-[#f0f2f5] hover:text-[#0a1a3c] transition-colors"
+            >
+              <span className="text-[10px]">{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
+
+          <div className="pt-3 pb-1 px-3">
+            <div className="text-[9px] font-bold uppercase tracking-widest text-[#c5c6cf]">Danger</div>
+          </div>
+
+          {dangerNav.map(item => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#C05A00] hover:bg-[#fef4ed] transition-colors"
             >
               <span className="text-[10px]">{item.icon}</span>
               {item.label}
