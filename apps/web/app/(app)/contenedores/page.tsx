@@ -16,7 +16,7 @@ export default async function ContenedoresPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight">{t('title')}</h1>
-          <p className="text-[11px] text-[#8a9aaa] mt-0.5">{containers.length} registros</p>
+          <p className="text-[11px] text-[#8a9aaa] mt-0.5">{containers.length} {t('records')}</p>
         </div>
         <div className="flex items-center gap-2">
           <a
@@ -67,7 +67,7 @@ export default async function ContenedoresPage() {
                     <StatusBadge status={c.current_status} label={ts(c.current_status as any)} />
                   </td>
                   <td className="px-5 py-3">
-                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">Ver →</a>
+                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">{t('view')}</a>
                   </td>
                 </tr>
               )

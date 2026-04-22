@@ -1,6 +1,7 @@
 import { getClientById, getClientCargoSnapshot } from '@/lib/clients'
 import { StatusBadge } from '@/components/status-badge'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 export default async function ClienteDetailPage({
   params,
@@ -8,14 +9,19 @@ export default async function ClienteDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [client, snapshot] = await Promise.all([
+  const [client, snapshot, tc, tg, ti] = await Promise.all([
     getClientById(id).catch(() => null),
     getClientCargoSnapshot(id),
+    getTranslations('cargo'),
+    getTranslations('containers'),
+    getTranslations('invoices'),
   ])
   if (!client) notFound()
 
   const containers = client.container_clients?.map((cc: any) => cc.containers).filter(Boolean) ?? []
   const invoices   = (client.invoices as any[]) ?? []
+
+  const TABLE_HEADERS = [tg('container'), tg('route'), tg('eta'), tg('status'), '']
 
   return (
     <div className="p-8 max-w-[960px] space-y-8">
@@ -23,7 +29,7 @@ export default async function ClienteDetailPage({
       {/* Header */}
       <div>
         <a href="/clientes" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
-          ← Clientes
+          {tg('backToClients')}
         </a>
         <div className="flex items-start justify-between mt-2">
           <div>
@@ -40,16 +46,16 @@ export default async function ClienteDetailPage({
       {/* ─── Cargo Snapshot ─── */}
       <div>
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
-          Carga Activa
+          {tc('activeTitle')}
         </h2>
 
         {/* KPI strip */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
           {[
-            { label: 'En Tránsito',  value: snapshot.inTransit.length, symbol: '◈', color: '#4A6FA5', bg: '#eef2f8' },
-            { label: 'En Aduana',    value: snapshot.inCustoms.length, symbol: '◆', color: '#B8860B', bg: '#fdf8ec' },
-            { label: 'Entregados',   value: snapshot.delivered.length, symbol: '✓', color: '#1A7A8A', bg: '#edf6f7' },
-            { label: 'Total activo', value: snapshot.inTransit.length + snapshot.inCustoms.length, symbol: '◱', color: '#0a1a3c', bg: '#f0f2f5' },
+            { label: tc('inTransit'),  value: snapshot.inTransit.length, symbol: '◈', color: '#4A6FA5', bg: '#eef2f8' },
+            { label: tc('inCustoms'),  value: snapshot.inCustoms.length, symbol: '◆', color: '#B8860B', bg: '#fdf8ec' },
+            { label: tc('delivered'),  value: snapshot.delivered.length, symbol: '✓', color: '#1A7A8A', bg: '#edf6f7' },
+            { label: tc('totalActive'), value: snapshot.inTransit.length + snapshot.inCustoms.length, symbol: '◱', color: '#0a1a3c', bg: '#f0f2f5' },
           ].map(kpi => (
             <div key={kpi.label} className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
               <div className="h-[3px]" style={{ background: kpi.color }} />
@@ -67,7 +73,7 @@ export default async function ClienteDetailPage({
         {snapshot.totalValue > 0 && (
           <div className="bg-[#eef2f8] rounded-xl px-5 py-3 flex items-center justify-between mb-5">
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#556479]">
-              ◱ Valor declarado total (facturas)
+              ◱ {tc('declaredValue')}
             </span>
             <span className="text-sm font-extrabold text-[#0a1a3c]">
               USD {snapshot.totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -81,7 +87,7 @@ export default async function ClienteDetailPage({
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-[#f0f2f5]">
-                  {['Contenedor', 'Ruta', 'ETA', 'Estado', ''].map(h => (
+                  {TABLE_HEADERS.map(h => (
                     <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                   ))}
                 </tr>
@@ -98,7 +104,7 @@ export default async function ClienteDetailPage({
                     </td>
                     <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
                     <td className="px-5 py-3">
-                      <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">Ver →</a>
+                      <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">{tg('view')}</a>
                     </td>
                   </tr>
                 ))}
@@ -108,7 +114,7 @@ export default async function ClienteDetailPage({
         ) : (
           <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] px-5 py-8 text-center">
             <p className="text-2xl mb-2">✓</p>
-            <p className="text-xs text-[#b0bac3]">Sin carga activa en este momento.</p>
+            <p className="text-xs text-[#b0bac3]">{tc('noCargo')}</p>
           </div>
         )}
       </div>
@@ -116,13 +122,13 @@ export default async function ClienteDetailPage({
       {/* ─── Historial de Contenedores ─── */}
       <div>
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
-          Historial de Contenedores ({containers.length})
+          {tc('containerHistory')} ({containers.length})
         </h2>
         <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] overflow-hidden">
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-[#f0f2f5]">
-                {['Contenedor', 'Ruta', 'ETA', 'Estado', ''].map(h => (
+                {TABLE_HEADERS.map(h => (
                   <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                 ))}
               </tr>
@@ -139,14 +145,14 @@ export default async function ClienteDetailPage({
                   </td>
                   <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
                   <td className="px-5 py-3">
-                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">Ver →</a>
+                    <a href={`/contenedores/${c.id}`} className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]">{tg('view')}</a>
                   </td>
                 </tr>
               ))}
               {containers.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-5 py-8 text-center text-[#b0bac3]">
-                    Sin contenedores registrados.
+                    {tc('noContainers')}
                   </td>
                 </tr>
               )}
@@ -158,7 +164,7 @@ export default async function ClienteDetailPage({
       {/* ─── Facturas ─── */}
       <div>
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-3">
-          Facturas ({invoices.length})
+          {tc('invoicesTitle')} ({invoices.length})
         </h2>
         <div className="space-y-4">
           {invoices.map((inv: any) => (
@@ -167,7 +173,7 @@ export default async function ClienteDetailPage({
                 <div>
                   <span className="font-bold text-[#0a1a3c] text-sm">{inv.invoice_number}</span>
                   <span className="ml-3 text-[10px] text-[#8a9aaa]">
-                    Contenedor: <span className="font-mono font-bold">{inv.containers?.container_number ?? '—'}</span>
+                    {tc('containerLabel')}: <span className="font-mono font-bold">{inv.containers?.container_number ?? '—'}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -176,13 +182,12 @@ export default async function ClienteDetailPage({
                       {inv.currency} {Number(inv.declared_value).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                     </span>
                   )}
-                  {/* Status badge — deuteranopia-safe */}
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${
                     inv.status === 'pagada'    ? 'bg-[#edf6f7] text-[#1A7A8A]' :
                     inv.status === 'cancelada' ? 'bg-[#fef4ed] text-[#C05A00]' :
                                                  'bg-[#fdf8ec] text-[#B8860B]'
                   }`}>
-                    {inv.status === 'pagada' ? '✓ Pagada' : inv.status === 'cancelada' ? '✕ Cancelada' : '◆ Pendiente'}
+                    {inv.status === 'pagada' ? `✓ ${ti('pagada')}` : inv.status === 'cancelada' ? `✕ ${ti('cancelada')}` : `◆ ${ti('pendiente')}`}
                   </span>
                 </div>
               </div>
@@ -191,7 +196,7 @@ export default async function ClienteDetailPage({
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-[#f0f2f5]">
-                      {['Descripción', 'Cantidad', 'Unidad', 'Precio Unit.', 'Total'].map(h => (
+                      {[tc('description'), tc('quantity'), tc('unit'), tc('unitPrice'), tc('total')].map(h => (
                         <th key={h} className="px-5 py-2 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                       ))}
                     </tr>
@@ -214,13 +219,13 @@ export default async function ClienteDetailPage({
                 </table>
               )}
               {(!inv.invoice_items || inv.invoice_items.length === 0) && (
-                <p className="px-6 py-4 text-[11px] text-[#b0bac3]">Sin productos registrados.</p>
+                <p className="px-6 py-4 text-[11px] text-[#b0bac3]">{tc('noProductsShort')}</p>
               )}
             </div>
           ))}
           {invoices.length === 0 && (
             <div className="bg-white rounded-xl shadow-[0_1px_20px_rgba(24,28,30,0.06)] px-6 py-8 text-center text-[#b0bac3] text-xs">
-              Sin facturas registradas.
+              {tc('noInvoices')}
             </div>
           )}
         </div>

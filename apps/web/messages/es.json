@@ -131,7 +131,22 @@
     "linkedInvoices": "Facturas vinculadas",
     "viewProfile": "Ver perfil completo →",
     "declaredTotal": "Valor declarado total",
-    "noProducts": "Sin productos registrados para este cliente."
+    "noProducts": "Sin productos registrados para este cliente.",
+    "noContainers": "Sin contenedores registrados.",
+    "noInvoices": "Sin facturas registradas.",
+    "noProductsShort": "Sin productos registrados.",
+    "share": "% del contenedor",
+    "quantity": "Cantidad",
+    "unit": "Unidad",
+    "unitPrice": "Precio Unit.",
+    "total": "Total",
+    "descriptionPlaceholder": "Descripción del producto *",
+    "skuOptional": "SKU (opcional)",
+    "declaredValueLabel": "Valor declarado",
+    "invoiceOptional": "Factura (opcional)",
+    "containerLabel": "Contenedor",
+    "cancel": "Cancelar",
+    "invoicesTitle": "Facturas"
   },
   "clients": {
     "title": "Clientes",
@@ -142,7 +157,10 @@
     "containers": "Contenedores",
     "empty": "Sin clientes.",
     "inactive": "Inactivo",
-    "exportCsv": "↓ CSV"
+    "exportCsv": "↓ CSV",
+    "records": "registros",
+    "view": "Ver →",
+    "backToClients": "← Clientes"
   },
   "dashboard": {
     "title": "Dashboard Ejecutivo",

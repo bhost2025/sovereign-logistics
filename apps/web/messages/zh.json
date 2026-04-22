@@ -131,7 +131,22 @@
     "linkedInvoices": "关联发票",
     "viewProfile": "查看完整资料 →",
     "declaredTotal": "申报总值",
-    "noProducts": "该客户暂无货品记录。"
+    "noProducts": "该客户暂无货品记录。",
+    "noContainers": "暂无集装箱记录。",
+    "noInvoices": "暂无发票记录。",
+    "noProductsShort": "暂无货品记录。",
+    "share": "% 货柜份额",
+    "quantity": "数量",
+    "unit": "单位",
+    "unitPrice": "单价",
+    "total": "合计",
+    "descriptionPlaceholder": "货品描述 *",
+    "skuOptional": "SKU（可选）",
+    "declaredValueLabel": "申报价值",
+    "invoiceOptional": "发票（可选）",
+    "containerLabel": "集装箱",
+    "cancel": "取消",
+    "invoicesTitle": "发票"
   },
   "clients": {
     "title": "客户",
@@ -142,7 +157,10 @@
     "containers": "集装箱",
     "empty": "暂无客户。",
     "inactive": "已停用",
-    "exportCsv": "↓ 导出CSV"
+    "exportCsv": "↓ 导出CSV",
+    "records": "条记录",
+    "view": "查看 →",
+    "backToClients": "← 客户列表"
   },
   "dashboard": {
     "title": "管理仪表板",

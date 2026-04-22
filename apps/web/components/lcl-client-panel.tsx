@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { addProduct, deleteProduct } from '@/app/(app)/contenedores/[id]/products/actions'
 
 type Client = {
@@ -49,13 +50,15 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
   const [openClientId, setOpenClientId] = useState<string | null>(null)
   const [addingProduct, setAddingProduct] = useState(false)
   const [pending, setPending] = useState(false)
+  const t  = useTranslations('cargo')
+  const tc = useTranslations('containers')
+  const ti = useTranslations('invoices')
 
-  const activeClient = clients.find(cc => cc.clients?.id === openClientId)
-  const clientProducts = products.filter(p => p.client_id === openClientId)
-  const clientInvoices = invoices.filter(inv => {
-    // match invoices to this client by invoice_id references in products
-    return clientProducts.some(p => p.invoice_id === inv.id) || inv.clients?.name === activeClient?.clients?.name
-  })
+  const activeClient     = clients.find(cc => cc.clients?.id === openClientId)
+  const clientProducts   = products.filter(p => p.client_id === openClientId)
+  const clientInvoices   = invoices.filter(inv =>
+    clientProducts.some(p => p.invoice_id === inv.id) || inv.clients?.name === activeClient?.clients?.name
+  )
   const clientDeclaredTotal = clientProducts.reduce((sum, p) => sum + (p.declared_value ?? 0), 0)
 
   async function handleAddProduct(formData: FormData) {
@@ -81,18 +84,16 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
               type="button"
               onClick={() => setOpenClientId(isOpen ? null : c.id)}
               className={`w-full text-left flex items-start justify-between gap-2 p-3 rounded-lg transition-colors ${
-                isOpen
-                  ? 'bg-[#eef2f8] ring-1 ring-[#4A6FA5]/30'
-                  : 'hover:bg-[#f7fafc]'
+                isOpen ? 'bg-[#eef2f8] ring-1 ring-[#4A6FA5]/30' : 'hover:bg-[#f7fafc]'
               }`}
             >
               <div className="min-w-0">
                 <div className="text-xs font-bold text-[#181c1e] truncate">{c.name}</div>
                 {c.contact_name && <div className="text-[10px] text-[#8a9aaa]">{c.contact_name}</div>}
-                {c.email && <div className="text-[10px] text-[#8a9aaa]">{c.email}</div>}
+                {c.email        && <div className="text-[10px] text-[#8a9aaa]">{c.email}</div>}
                 {clientProds.length > 0 && (
                   <div className="text-[9px] text-[#4A6FA5] font-bold mt-1">
-                    {clientProds.length} producto{clientProds.length > 1 ? 's' : ''}
+                    {clientProds.length} {t('products').toLowerCase()}
                   </div>
                 )}
               </div>
@@ -109,7 +110,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
         })}
 
         {clients.length === 0 && (
-          <p className="text-[11px] text-[#b0bac3] py-2">Sin clientes asignados.</p>
+          <p className="text-[11px] text-[#b0bac3] py-2">{tc('noClients')}</p>
         )}
       </div>
 
@@ -130,7 +131,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
             </div>
             {activeClient.share_pct != null && (
               <span className="text-xs font-bold bg-[#eef2f8] text-[#4A6FA5] px-2.5 py-1 rounded">
-                {activeClient.share_pct}% del contenedor
+                {activeClient.share_pct}{t('share')}
               </span>
             )}
           </div>
@@ -138,7 +139,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
           {/* Declared total */}
           {clientDeclaredTotal > 0 && (
             <div className="flex items-center justify-between bg-white rounded-lg px-4 py-2.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">Valor declarado total</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('declaredTotal')}</span>
               <span className="text-sm font-extrabold text-[#0a1a3c]">
                 USD {clientDeclaredTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
               </span>
@@ -149,14 +150,14 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
-                Productos ({clientProducts.length})
+                {t('products')} ({clientProducts.length})
               </span>
               <button
                 type="button"
                 onClick={() => setAddingProduct(a => !a)}
                 className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
               >
-                {addingProduct ? 'Cancelar' : '+ Agregar'}
+                {addingProduct ? t('cancel') : t('addProduct')}
               </button>
             </div>
 
@@ -172,14 +173,14 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                       type="text"
                       name="description"
                       required
-                      placeholder="Descripción del producto *"
+                      placeholder={t('descriptionPlaceholder')}
                       className="w-full text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                     />
                   </div>
                   <input
                     type="text"
                     name="sku"
-                    placeholder="SKU (opcional)"
+                    placeholder={t('skuOptional')}
                     className="text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                   />
                   <div className="flex gap-1.5">
@@ -189,14 +190,14 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                       defaultValue="1"
                       min="0"
                       step="any"
-                      placeholder="Qty"
+                      placeholder={t('quantity')}
                       className="w-20 text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                     />
                     <select
                       name="unit"
                       className="flex-1 text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                     >
-                      <option value="">Unidad</option>
+                      <option value="">{t('unit')}</option>
                       {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                     </select>
                   </div>
@@ -206,7 +207,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                       name="declared_value"
                       min="0"
                       step="any"
-                      placeholder="Valor declarado"
+                      placeholder={t('declaredValueLabel')}
                       className="flex-1 text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                     />
                     <select
@@ -224,7 +225,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                       name="invoice_id"
                       className="col-span-2 text-xs text-[#181c1e] bg-[#f7fafc] border border-[#e8ebee] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#4A6FA5]"
                     >
-                      <option value="">Factura (opcional)</option>
+                      <option value="">{t('invoiceOptional')}</option>
                       {invoices.map(inv => (
                         <option key={inv.id} value={inv.id}>{inv.invoice_number}</option>
                       ))}
@@ -236,7 +237,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                   disabled={pending}
                   className="bg-[#0a1a3c] text-white text-[10px] font-bold px-4 py-1.5 rounded hover:bg-[#142a5c] transition-colors disabled:opacity-50"
                 >
-                  {pending ? 'Guardando...' : 'Guardar producto'}
+                  {pending ? t('saving') : t('saveProduct')}
                 </button>
               </form>
             )}
@@ -247,7 +248,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                 <table className="w-full text-[11px]">
                   <thead>
                     <tr className="border-b border-[#f0f2f5]">
-                      {['Descripción', 'SKU', 'Qty', 'Valor', ''].map(h => (
+                      {[t('products'), 'SKU', t('quantity'), t('value'), ''].map(h => (
                         <th key={h} className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">
                           {h}
                         </th>
@@ -261,9 +262,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                         <tr key={p.id} className="border-b border-[#f7fafc] last:border-0">
                           <td className="px-3 py-2 font-semibold text-[#181c1e]">{p.description}</td>
                           <td className="px-3 py-2 font-mono text-[#8a9aaa]">{p.sku ?? '—'}</td>
-                          <td className="px-3 py-2 text-[#6b7a8a]">
-                            {p.quantity} {p.unit ?? ''}
-                          </td>
+                          <td className="px-3 py-2 text-[#6b7a8a]">{p.quantity} {p.unit ?? ''}</td>
                           <td className="px-3 py-2 font-bold text-[#556479]">
                             {p.declared_value
                               ? `${p.currency} ${Number(p.declared_value).toLocaleString()}`
@@ -271,12 +270,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
                           </td>
                           <td className="px-3 py-2">
                             <form action={delAction}>
-                              <button
-                                type="submit"
-                                className="text-[9px] font-bold text-[#b0bac3] hover:text-[#C05A00] transition-colors"
-                              >
-                                ✕
-                              </button>
+                              <button type="submit" className="text-[9px] font-bold text-[#b0bac3] hover:text-[#C05A00] transition-colors">✕</button>
                             </form>
                           </td>
                         </tr>
@@ -287,7 +281,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
               </div>
             ) : (
               <p className="text-[11px] text-[#b0bac3] py-2 text-center bg-white rounded-lg border border-[#e8ebee] px-3">
-                Sin productos registrados para este cliente.
+                {t('noProducts')}
               </p>
             )}
           </div>
@@ -296,7 +290,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
           {clientInvoices.length > 0 && (
             <div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] mb-2">
-                Facturas vinculadas ({clientInvoices.length})
+                {t('linkedInvoices')} ({clientInvoices.length})
               </div>
               <div className="space-y-1.5">
                 {clientInvoices.map(inv => (
@@ -318,7 +312,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
             href={`/clientes/${openClientId}`}
             className="block text-center text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors py-1"
           >
-            Ver perfil completo →
+            {t('viewProfile')}
           </a>
         </div>
       )}
