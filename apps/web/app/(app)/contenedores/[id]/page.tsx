@@ -6,7 +6,7 @@ import { LclClientPanel } from '@/components/lcl-client-panel'
 import { notFound } from 'next/navigation'
 import { getTranslations, getLocale } from 'next-intl/server'
 import { can } from '@/lib/auth/can'
-import { softDeleteContainer } from '../actions'
+import { softDeleteContainer, deleteInvoiceAction } from '../actions'
 
 type Tab = 'info' | 'documentos' | 'historial' | 'facturas'
 const TAB_IDS: Tab[] = ['info', 'documentos', 'historial', 'facturas']
@@ -41,13 +41,15 @@ export default async function ContenedorDetallePage({
 
   const activeTab: Tab = (TAB_IDS.find(id => id === tabParam) as Tab | undefined) ?? 'info'
 
-  const [container, t, ts, locale, canEdit, canDelete] = await Promise.all([
+  const [container, t, ts, locale, canEdit, canDelete, canEditInvoice, canDeleteInvoice] = await Promise.all([
     getContainerById(id).catch(() => null),
     getTranslations('containers'),
     getTranslations('status'),
     getLocale(),
     can('edit_containers'),
     can('delete_containers'),
+    can('create_invoices'),
+    can('delete_invoices'),
   ])
   if (!container) notFound()
 
@@ -108,6 +110,14 @@ export default async function ContenedorDetallePage({
               </button>
             </form>
           )}
+          <a
+            href={`/track/${container.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold text-[#556479] border border-[#c5c6cf] px-3 py-1.5 rounded-lg hover:border-[#0a1a3c] hover:text-[#0a1a3c] transition-colors"
+          >
+            ◎ {t('trackingLink')}
+          </a>
         </div>
       </div>
 
@@ -315,7 +325,7 @@ export default async function ContenedorDetallePage({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-[#f0f2f5]">
-                    {[t('invoiceNumber'), t('client'), t('description'), t('value')].map(h => (
+                    {[t('invoiceNumber'), t('client'), t('description'), t('value'), ''].map(h => (
                       <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
                     ))}
                   </tr>
@@ -328,6 +338,25 @@ export default async function ContenedorDetallePage({
                       <td className="px-5 py-3 text-[#6b7a8a]">{inv.description ?? '—'}</td>
                       <td className="px-5 py-3 font-bold text-[#556479]">
                         {inv.declared_value ? `${inv.currency} ${Number(inv.declared_value).toLocaleString()}` : '—'}
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-3">
+                          {canEditInvoice && (
+                            <a
+                              href={`/contenedores/${container.id}/facturas/${inv.id}/editar`}
+                              className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]"
+                            >
+                              {t('editBtn')}
+                            </a>
+                          )}
+                          {canDeleteInvoice && (
+                            <form action={deleteInvoiceAction.bind(null, inv.id, container.id)}>
+                              <button type="submit" className="text-[10px] font-bold text-[#C05A00] hover:text-[#0a1a3c]">
+                                {t('deleteInvoice')}
+                              </button>
+                            </form>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

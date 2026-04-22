@@ -274,3 +274,77 @@ export async function createInvoiceAction(formData: FormData) {
   revalidatePath(`/contenedores/${containerId}`)
   redirect(`/contenedores/${containerId}`)
 }
+
+export async function updateInvoiceAction(invoiceId: string, containerId: string, formData: FormData) {
+  await requireCan('create_invoices')
+  const supabase = await createClient() as any
+
+  const { data: before } = await supabase
+    .from('invoices')
+    .select('invoice_number, currency, declared_value, description, status')
+    .eq('id', invoiceId)
+    .single()
+
+  const payload = {
+    invoice_number: (formData.get('invoice_number') as string).trim(),
+    currency:       (formData.get('currency') as string) || 'USD',
+    declared_value: formData.get('declared_value') ? Number(formData.get('declared_value')) : null,
+    description:    (formData.get('description') as string)?.trim() || null,
+    status:         (formData.get('status') as string) || 'pendiente',
+  }
+
+  const { error } = await supabase
+    .from('invoices')
+    .update(payload)
+    .eq('id', invoiceId)
+
+  if (error) redirect(`/contenedores/${containerId}/facturas/${invoiceId}/editar?error=1`)
+
+  // Replace all items
+  await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId)
+
+  const count = Number(formData.get('items_count') ?? 0)
+  const items: any[] = []
+  for (let i = 0; i < count; i++) {
+    const desc  = (formData.get(`items[${i}][description]`) as string)?.trim()
+    const qty   = Number(formData.get(`items[${i}][quantity]`))
+    const unit  = (formData.get(`items[${i}][unit]`) as string)?.trim() || null
+    const price = Number(formData.get(`items[${i}][unit_price]`))
+    if (desc) items.push({ invoice_id: invoiceId, description: desc, quantity: qty || 1, unit, unit_price: price || 0 })
+  }
+  if (items.length > 0) await supabase.from('invoice_items').insert(items)
+
+  await writeLog({
+    action:       'update',
+    entity_type:  'invoice',
+    entity_id:    invoiceId,
+    entity_label: payload.invoice_number,
+    changes:      diffObjects(before ?? {}, payload),
+  })
+
+  revalidatePath(`/contenedores/${containerId}`)
+  redirect(`/contenedores/${containerId}`)
+}
+
+export async function deleteInvoiceAction(invoiceId: string, containerId: string) {
+  await requireCan('delete_invoices')
+  const supabase = await createClient() as any
+
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('invoice_number')
+    .eq('id', invoiceId)
+    .single()
+
+  await supabase.from('invoices').update({ deleted_at: new Date().toISOString() }).eq('id', invoiceId)
+
+  await writeLog({
+    action:       'delete',
+    entity_type:  'invoice',
+    entity_id:    invoiceId,
+    entity_label: invoice?.invoice_number ?? invoiceId,
+  })
+
+  revalidatePath(`/contenedores/${containerId}`)
+  redirect(`/contenedores/${containerId}`)
+}

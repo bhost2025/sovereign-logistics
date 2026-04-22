@@ -85,7 +85,15 @@
     "editBtn": "Guardar Cambios",
     "archiveBtn": "Archivar",
     "deleteConfirm": "¿Archivar este contenedor? Podrás restaurarlo después.",
-    "errorEdit": "Error al guardar. Verifica los datos."
+    "errorEdit": "Error al guardar. Verifica los datos.",
+    "trackingLink": "Ver Tracking",
+    "archivedLink": "Archivados",
+    "archivedTitle": "Contenedores Archivados",
+    "archivedDesc": "Contenedores archivados. Usa Restaurar para reactivarlos.",
+    "archivedAt": "Archivado",
+    "restoreBtn": "Restaurar",
+    "noArchived": "Sin contenedores archivados",
+    "deleteInvoice": "Eliminar"
   },
   "documents": {
     "title": "Documentos",
@@ -518,6 +526,9 @@
     "declaredValueCustoms": "Valor Declarado Total (para aduana)",
     "declaredValueNote": "Se usa para trámites de aduana. Puede diferir del total calculado.",
     "saveInvoice": "Guardar Factura",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "editTitle": "Editar Factura",
+    "backToContainer": "← Volver al contenedor",
+    "statusLabel": "Estado de la Factura"
   }
 }

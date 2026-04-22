@@ -85,7 +85,15 @@
     "editBtn": "Save Changes",
     "archiveBtn": "Archive",
     "deleteConfirm": "Archive this container? You can restore it later.",
-    "errorEdit": "Save error. Check the data."
+    "errorEdit": "Save error. Check the data.",
+    "trackingLink": "View Tracking",
+    "archivedLink": "Archived",
+    "archivedTitle": "Archived Containers",
+    "archivedDesc": "Archived containers. Use Restore to reactivate them.",
+    "archivedAt": "Archived",
+    "restoreBtn": "Restore",
+    "noArchived": "No archived containers",
+    "deleteInvoice": "Delete"
   },
   "documents": {
     "title": "Documents",
@@ -518,6 +526,9 @@
     "declaredValueCustoms": "Total Declared Value (for customs)",
     "declaredValueNote": "Used for customs procedures. May differ from the calculated total.",
     "saveInvoice": "Save Invoice",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "editTitle": "Edit Invoice",
+    "backToContainer": "← Back to container",
+    "statusLabel": "Invoice Status"
   }
 }

@@ -1,11 +1,13 @@
 import { getContainersByStatus } from '@/lib/containers'
 import { ContainersSearchTable } from '@/components/containers-search-table'
 import { getTranslations } from 'next-intl/server'
+import { can } from '@/lib/auth/can'
 
 export default async function ContenedoresPage() {
-  const [containers, t] = await Promise.all([
+  const [containers, t, canArchive] = await Promise.all([
     getContainersByStatus(),
     getTranslations('containers'),
+    can('delete_containers'),
   ])
 
   return (
@@ -16,6 +18,14 @@ export default async function ContenedoresPage() {
           <p className="text-[11px] text-[#8a9aaa] mt-0.5">{containers.length} {t('records')}</p>
         </div>
         <div className="flex items-center gap-2">
+          {canArchive && (
+            <a
+              href="/contenedores/archivados"
+              className="text-xs font-bold text-[#556479] bg-[#f0f2f5] hover:bg-[#e0e3e8] px-3 py-2 rounded-md transition-colors"
+            >
+              {t('archivedLink')}
+            </a>
+          )}
           <a
             href="/api/export/contenedores"
             className="text-xs font-bold text-[#556479] bg-[#f0f2f5] hover:bg-[#e0e3e8] px-3 py-2 rounded-md transition-colors"

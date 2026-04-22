@@ -85,7 +85,15 @@
     "editBtn": "保存更改",
     "archiveBtn": "归档",
     "deleteConfirm": "归档此货柜？稍后可以恢复。",
-    "errorEdit": "保存出错，请检查数据。"
+    "errorEdit": "保存出错，请检查数据。",
+    "trackingLink": "查看追踪",
+    "archivedLink": "已归档",
+    "archivedTitle": "已归档货柜",
+    "archivedDesc": "已归档的货柜。使用恢复按钮可重新激活。",
+    "archivedAt": "归档时间",
+    "restoreBtn": "恢复",
+    "noArchived": "无已归档货柜",
+    "deleteInvoice": "删除"
   },
   "documents": {
     "title": "单据文件",
@@ -518,6 +526,9 @@
     "declaredValueCustoms": "总申报价值（用于海关）",
     "declaredValueNote": "用于报关程序，可能与计算合计不同。",
     "saveInvoice": "保存发票",
-    "cancel": "取消"
+    "cancel": "取消",
+    "editTitle": "编辑发票",
+    "backToContainer": "← 返回货柜",
+    "statusLabel": "发票状态"
   }
 }
