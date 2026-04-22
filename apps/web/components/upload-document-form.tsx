@@ -52,7 +52,7 @@ export function UploadDocumentForm({ containerId }: { containerId: string }) {
               <option value="">{t('selectCategory')}</option>
               {DOCUMENT_CATEGORIES.map(cat => (
                 <option key={cat.slug} value={cat.slug}>
-                  {cat.label}{cat.required ? ' *' : ''}
+                  {t(`categories.${cat.slug}` as any)}{cat.required ? ' *' : ''}
                 </option>
               ))}
             </select>

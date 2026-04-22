@@ -4,20 +4,27 @@ import { ChangeStatusForm } from '@/components/change-status-form'
 import { DocumentsTab } from '@/components/documents-tab'
 import { LclClientPanel } from '@/components/lcl-client-panel'
 import { notFound } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 
 type Tab = 'info' | 'documentos' | 'historial' | 'facturas'
 const TAB_IDS: Tab[] = ['info', 'documentos', 'historial', 'facturas']
 
-function formatLastSeen(updatedAt: string) {
+function formatLastSeen(updatedAt: string, locale: string) {
   const diff = Date.now() - new Date(updatedAt).getTime()
   const mins  = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days  = Math.floor(diff / 86400000)
-  if (mins < 1)   return 'hace menos de 1 min'
-  if (mins < 60)  return `hace ${mins} min`
-  if (hours < 24) return `hace ${hours}h`
-  return `hace ${days}d`
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  if (mins < 1)   return rtf.format(0, 'minute')
+  if (mins < 60)  return rtf.format(-mins, 'minute')
+  if (hours < 24) return rtf.format(-hours, 'hour')
+  return rtf.format(-days, 'day')
+}
+
+function dateLocale(locale: string) {
+  if (locale === 'zh') return 'zh-CN'
+  if (locale === 'en') return 'en-US'
+  return 'es-MX'
 }
 
 export default async function ContenedorDetallePage({
@@ -32,10 +39,11 @@ export default async function ContenedorDetallePage({
 
   const activeTab: Tab = (TAB_IDS.find(id => id === tabParam) as Tab | undefined) ?? 'info'
 
-  const [container, t, ts] = await Promise.all([
+  const [container, t, ts, locale] = await Promise.all([
     getContainerById(id).catch(() => null),
     getTranslations('containers'),
     getTranslations('status'),
+    getLocale(),
   ])
   if (!container) notFound()
 
@@ -66,7 +74,7 @@ export default async function ContenedorDetallePage({
           <div className="flex items-center gap-2 mt-2 text-[10px] text-[#8a9aaa]">
             <span>◎</span>
             <span>
-              {t('lastUpdated')}: <strong className="text-[#556479]">{formatLastSeen(container.updated_at)}</strong>
+              {t('lastUpdated')}: <strong className="text-[#556479]">{formatLastSeen(container.updated_at, locale)}</strong>
               {lastUpdater && <> · {t('by')} <strong className="text-[#556479]">{lastUpdater}</strong></>}
             </span>
           </div>
@@ -111,9 +119,9 @@ export default async function ContenedorDetallePage({
                 {[
                   { label: t('originPort'), value: container.origin_port },
                   { label: t('destPort'),   value: container.destination_port },
-                  { label: t('departure'),  value: container.departure_date ? new Date(container.departure_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
-                  { label: t('eta'),        value: container.eta_date ? new Date(container.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
-                  { label: t('arrival'),    value: container.arrival_date ? new Date(container.arrival_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                  { label: t('departure'),  value: container.departure_date ? new Date(container.departure_date).toLocaleDateString(dateLocale(locale), { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                  { label: t('eta'),        value: container.eta_date ? new Date(container.eta_date).toLocaleDateString(dateLocale(locale), { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
+                  { label: t('arrival'),    value: container.arrival_date ? new Date(container.arrival_date).toLocaleDateString(dateLocale(locale), { day: '2-digit', month: 'long', year: 'numeric' }) : '—' },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between items-baseline">
                     <span className="text-[10px] font-bold text-[#8a9aaa] uppercase tracking-wider">{label}</span>
@@ -196,7 +204,7 @@ export default async function ContenedorDetallePage({
                               {ts(entry.new_status as any)}
                             </span>
                             <span className="text-[10px] text-[#8a9aaa] shrink-0">
-                              {new Date(entry.changed_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              {new Date(entry.changed_at).toLocaleDateString(dateLocale(locale), { day: '2-digit', month: 'short', year: 'numeric' })}
                             </span>
                           </div>
                           {entry.notes && <p className="text-[11px] text-[#6b7a8a] mt-0.5">{entry.notes}</p>}
@@ -249,7 +257,7 @@ export default async function ContenedorDetallePage({
                             {ts(entry.new_status as any)}
                           </span>
                           <span className="text-[10px] text-[#8a9aaa] shrink-0">
-                            {new Date(entry.changed_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            {new Date(entry.changed_at).toLocaleDateString(dateLocale(locale), { day: '2-digit', month: 'short', year: 'numeric' })}
                           </span>
                         </div>
                         {entry.notes && <p className="text-[11px] text-[#6b7a8a] mt-0.5">{entry.notes}</p>}

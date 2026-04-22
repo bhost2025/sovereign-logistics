@@ -1,24 +1,24 @@
 import { createClient } from '@/lib/supabase/server'
 import { getUserProfile } from '@/lib/auth/get-user-role'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
-const ROLE_LABEL: Record<string, string> = {
-  super_admin:   'Super Admin',
-  operator:      'Operador',
-  director:      'Director',
-  client_viewer: 'Cliente',
-}
-
 const ROLE_COLOR: Record<string, string> = {
-  super_admin:   'bg-purple-100 text-purple-700',
-  operator:      'bg-sky-100 text-sky-700',
-  director:      'bg-emerald-100 text-emerald-700',
-  client_viewer: 'bg-amber-100 text-amber-700',
+  super_admin:   'bg-[#eef2f8] text-[#4A6FA5]',
+  operator:      'bg-[#edf6f7] text-[#1A7A8A]',
+  director:      'bg-[#fdf8ec] text-[#B8860B]',
+  client_viewer: 'bg-[#f0f2f5] text-[#556479]',
 }
 
 export default async function UsuariosPage() {
-  const profile = await getUserProfile()
+  const [profile, t, ts, locale] = await Promise.all([
+    getUserProfile(),
+    getTranslations('admin'),
+    getTranslations('settings'),
+    getLocale(),
+  ])
   if (profile.role !== 'super_admin') redirect('/tablero')
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   const supabase = await createClient()
   const { data: users } = await supabase
@@ -27,19 +27,25 @@ export default async function UsuariosPage() {
     .eq('company_id', profile.company_id)
     .order('created_at', { ascending: true })
 
+  const ROLE_LABEL: Record<string, string> = {
+    super_admin:   t('roles.super_admin'),
+    operator:      t('roles.operator'),
+    director:      t('roles.director'),
+    client_viewer: t('roles.client_viewer'),
+  }
+
   return (
     <div className="p-8 max-w-[900px]">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <p className="text-[10px] font-bold text-[#8a9aaa] tracking-widest uppercase">Admin</p>
-          <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-1">Usuarios</h1>
-          <p className="text-[11px] text-[#8a9aaa] mt-0.5">{users?.length ?? 0} cuentas registradas</p>
+          <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-1">{t('title')}</h1>
+          <p className="text-[11px] text-[#8a9aaa] mt-0.5">{users?.length ?? 0} {t('name')}</p>
         </div>
         <a
           href="/admin/usuarios/nuevo"
           className="bg-[#0a1a3c] text-white text-xs font-bold px-4 py-2 rounded-md hover:bg-[#142a5c] transition-colors"
         >
-          + Nuevo Usuario
+          {t('newUser')}
         </a>
       </div>
 
@@ -47,7 +53,7 @@ export default async function UsuariosPage() {
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-[#f0f2f5]">
-              {['Nombre', 'Email', 'Rol', 'Estado', ''].map(h => (
+              {[t('name'), t('email'), t('role'), t('status'), ''].map(h => (
                 <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
                   {h}
                 </th>
@@ -60,7 +66,7 @@ export default async function UsuariosPage() {
                 <td className="px-5 py-3 font-bold text-[#0a1a3c]">
                   {u.full_name}
                   {u.id === profile.id && (
-                    <span className="ml-1.5 text-[9px] bg-[#f0f2f5] text-[#8a9aaa] font-bold px-1.5 py-0.5 rounded">Tú</span>
+                    <span className="ml-1.5 text-[9px] bg-[#f0f2f5] text-[#8a9aaa] font-bold px-1.5 py-0.5 rounded">{ts('you')}</span>
                   )}
                 </td>
                 <td className="px-5 py-3 text-[#6b7a8a]">{u.email}</td>
@@ -71,8 +77,8 @@ export default async function UsuariosPage() {
                 </td>
                 <td className="px-5 py-3">
                   {u.is_active
-                    ? <span className="text-[9px] font-bold text-emerald-600">Activo</span>
-                    : <span className="text-[9px] font-bold text-red-500">Inactivo</span>
+                    ? <span className="text-[9px] font-bold text-[#1A7A8A]">◎ {t('active')}</span>
+                    : <span className="text-[9px] font-bold text-[#C05A00]">◎ {t('inactive')}</span>
                   }
                 </td>
                 <td className="px-5 py-3">
@@ -80,7 +86,7 @@ export default async function UsuariosPage() {
                     href={`/admin/usuarios/${u.id}`}
                     className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c]"
                   >
-                    Editar →
+                    {t('edit')}
                   </a>
                 </td>
               </tr>

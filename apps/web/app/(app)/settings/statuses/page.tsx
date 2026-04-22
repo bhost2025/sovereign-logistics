@@ -1,4 +1,5 @@
 import { STATUS_CONFIG } from '@/components/status-badge'
+import { getTranslations } from 'next-intl/server'
 
 const STATUS_META: Record<string, { type: string; canSet: string[] }> = {
   en_puerto_origen:     { type: 'activo',    canSet: ['operator', 'super_admin'] },
@@ -12,21 +13,23 @@ const STATUS_META: Record<string, { type: string; canSet: string[] }> = {
   entregado:            { type: 'final',     canSet: ['operator', 'super_admin'] },
 }
 
-const TYPE_BADGE: Record<string, { label: string; color: string; bg: string }> = {
-  activo: { label: 'Activo',  color: '#4A6FA5', bg: '#eef2f8' },
-  alerta: { label: 'Alerta',  color: '#C05A00', bg: '#fef4ed' },
-  final:  { label: 'Final',   color: '#1A7A8A', bg: '#edf6f7' },
-}
-
-export default function SettingsStatusesPage() {
+export default async function SettingsStatusesPage() {
+  const t  = await getTranslations('settings')
+  const ts = await getTranslations('status')
   const statuses = Object.entries(STATUS_CONFIG)
+
+  const TYPE_BADGE: Record<string, { label: string; color: string; bg: string }> = {
+    activo: { label: t('typeActive'), color: '#4A6FA5', bg: '#eef2f8' },
+    alerta: { label: t('typeAlert'),  color: '#C05A00', bg: '#fef4ed' },
+    final:  { label: t('typeFinal'),  color: '#1A7A8A', bg: '#edf6f7' },
+  }
 
   return (
     <div className="p-8 max-w-[800px]">
       <div className="mb-8">
-        <h1 className="text-xl font-extrabold text-[#0a1a3c] tracking-tight">Estados de Contenedor</h1>
+        <h1 className="text-xl font-extrabold text-[#0a1a3c] tracking-tight">{t('statusTitle')}</h1>
         <p className="text-[11px] text-[#8a9aaa] mt-0.5">
-          {statuses.length} estados · Ciclo de vida completo China → México
+          {t('statusCount', { count: statuses.length })}
         </p>
       </div>
 
@@ -34,7 +37,7 @@ export default function SettingsStatusesPage() {
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-[#f0f2f5]">
-              {['Estado', 'Slug', 'Símbolo', 'Color', 'Tipo', 'Puede asignar'].map(h => (
+              {[t('status'), t('slugCol'), t('symbolCol'), t('colorCol'), t('typeCol'), t('canSetCol')].map(h => (
                 <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{h}</th>
               ))}
             </tr>
@@ -51,7 +54,7 @@ export default function SettingsStatusesPage() {
                       style={{ color: cfg.color, background: cfg.bg }}
                     >
                       <span className="w-[3px] self-stretch rounded-l" style={{ background: cfg.color }} />
-                      {cfg.symbol} {cfg.label}
+                      {cfg.symbol} {ts(slug as any)}
                     </span>
                   </td>
                   <td className="px-5 py-3 font-mono text-[10px] text-[#6b7a8a]">{slug}</td>
@@ -79,9 +82,7 @@ export default function SettingsStatusesPage() {
           </tbody>
         </table>
       </div>
-      <p className="text-[10px] text-[#b0bac3] mt-4">
-        ◎ Agregar o renombrar estados requiere una migración de base de datos. Disponible en próxima versión.
-      </p>
+      <p className="text-[10px] text-[#b0bac3] mt-4">◎ {t('noteStatuses')}</p>
     </div>
   )
 }

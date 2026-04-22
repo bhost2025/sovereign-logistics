@@ -1,7 +1,7 @@
 import { getClientById, getClientCargoSnapshot } from '@/lib/clients'
 import { StatusBadge } from '@/components/status-badge'
 import { notFound } from 'next/navigation'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 
 export default async function ClienteDetailPage({
   params,
@@ -9,13 +9,15 @@ export default async function ClienteDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [client, snapshot, tc, tg, ti] = await Promise.all([
+  const [client, snapshot, tc, tg, ti, locale] = await Promise.all([
     getClientById(id).catch(() => null),
     getClientCargoSnapshot(id),
     getTranslations('cargo'),
     getTranslations('containers'),
     getTranslations('invoices'),
+    getLocale(),
   ])
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
   if (!client) notFound()
 
   const containers = client.container_clients?.map((cc: any) => cc.containers).filter(Boolean) ?? []
@@ -76,7 +78,7 @@ export default async function ClienteDetailPage({
               ◱ {tc('declaredValue')}
             </span>
             <span className="text-sm font-extrabold text-[#0a1a3c]">
-              USD {snapshot.totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+              USD {snapshot.totalValue.toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
             </span>
           </div>
         )}
@@ -99,7 +101,7 @@ export default async function ClienteDetailPage({
                     <td className="px-5 py-3 text-[#6b7a8a]">{c.origin_port} → {c.destination_port}</td>
                     <td className="px-5 py-3 text-[#6b7a8a]">
                       {c.eta_date
-                        ? new Date(c.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+                        ? new Date(c.eta_date).toLocaleDateString(jsLocale, { day: '2-digit', month: 'short', year: 'numeric' })
                         : '—'}
                     </td>
                     <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
@@ -140,7 +142,7 @@ export default async function ClienteDetailPage({
                   <td className="px-5 py-3 text-[#6b7a8a]">{c.origin_port} → {c.destination_port}</td>
                   <td className="px-5 py-3 text-[#6b7a8a]">
                     {c.eta_date
-                      ? new Date(c.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
+                      ? new Date(c.eta_date).toLocaleDateString(jsLocale, { day: '2-digit', month: 'short', year: 'numeric' })
                       : '—'}
                   </td>
                   <td className="px-5 py-3"><StatusBadge status={c.current_status} /></td>
@@ -179,7 +181,7 @@ export default async function ClienteDetailPage({
                 <div className="flex items-center gap-3">
                   {inv.declared_value && (
                     <span className="text-xs font-bold text-[#181c1e]">
-                      {inv.currency} {Number(inv.declared_value).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      {inv.currency} {Number(inv.declared_value).toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
                     </span>
                   )}
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${
@@ -208,10 +210,10 @@ export default async function ClienteDetailPage({
                         <td className="px-5 py-2.5 text-[#6b7a8a]">{item.quantity}</td>
                         <td className="px-5 py-2.5 text-[#6b7a8a]">{item.unit ?? '—'}</td>
                         <td className="px-5 py-2.5 text-[#6b7a8a]">
-                          {Number(item.unit_price).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                          {Number(item.unit_price).toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
                         </td>
                         <td className="px-5 py-2.5 font-bold text-[#0a1a3c]">
-                          {Number(item.total).toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                          {Number(item.total).toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
                         </td>
                       </tr>
                     ))}

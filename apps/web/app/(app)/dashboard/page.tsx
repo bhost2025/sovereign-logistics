@@ -1,7 +1,7 @@
 import { getContainersByStatus, getKpiSummary, getContainersProximosEta, getDirectorStats } from '@/lib/containers'
 import { KpiCard } from '@/components/kpi-card'
 import { StatusBadge } from '@/components/status-badge'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 
 const INVOICE_STATUS_LABEL: Record<string, string> = {
   pendiente:  'Pendiente',
@@ -15,15 +15,18 @@ const INVOICE_STATUS_COLOR: Record<string, string> = {
 }
 
 export default async function DashboardPage() {
-  const [containers, kpis, proximos, stats, t, ts, ti] = await Promise.all([
+  const locale = await getLocale()
+  const [containers, kpis, proximos, stats, t, ts, ti, tc] = await Promise.all([
     getContainersByStatus(),
     getKpiSummary(),
     getContainersProximosEta(30),
-    getDirectorStats(),
+    getDirectorStats(locale),
     getTranslations('dashboard'),
     getTranslations('status'),
     getTranslations('invoices'),
+    getTranslations('containers'),
   ])
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   const detenidos = containers.filter(c => c.current_status === 'detenido_aduana')
   const sinActualizar = containers.filter(c => {
@@ -79,7 +82,7 @@ export default async function DashboardPage() {
                     <span className="text-[11px] text-[#8a9aaa]">{s.count} docs</span>
                   </div>
                   <span className="text-xs font-bold text-[#181c1e]">
-                    ${s.total.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                    ${s.total.toLocaleString(jsLocale, { minimumFractionDigits: 0 })}
                   </span>
                 </div>
               )
@@ -88,7 +91,7 @@ export default async function DashboardPage() {
           <div className="border-t border-[#f0f2f5] pt-3 flex justify-between items-center">
             <span className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('totalDeclared')}</span>
             <span className="text-sm font-extrabold text-[#0a1a3c]">
-              ${totalFacturado.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+              ${totalFacturado.toLocaleString(jsLocale, { minimumFractionDigits: 0 })}
             </span>
           </div>
         </div>
@@ -157,7 +160,7 @@ export default async function DashboardPage() {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-[#f0f2f5]">
-                {['Contenedor', 'Cliente', 'Ruta', 'ETA', 'Estado'].map(h => (
+                {[tc('container'), tc('client'), tc('route'), tc('eta'), tc('status')].map(h => (
                   <th key={h} className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">
                     {h}
                   </th>
@@ -182,7 +185,7 @@ export default async function DashboardPage() {
                     <td className="px-5 py-3 text-[#6b7a8a]">{c.origin_port} → {c.destination_port}</td>
                     <td className="px-5 py-3">
                       <div className="text-[#181c1e] font-semibold">
-                        {eta.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                        {eta.toLocaleDateString(jsLocale, { day: '2-digit', month: 'short' })}
                       </div>
                       <div className={`text-[9px] font-bold ${daysLeft <= 7 ? 'text-amber-600' : 'text-[#b0bac3]'}`}>
                         {daysLeft === 0 ? t('today') : daysLeft === 1 ? t('tomorrow') : t('inDays', { days: daysLeft })}
@@ -209,7 +212,7 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-extrabold text-[#0a1a3c]">▲ {t('alerts')}</h2>
             {totalAlertas > 0 && (
               <span className="text-[10px] font-bold bg-[#fef4ed] text-[#C05A00] px-2 py-0.5 rounded">
-                {totalAlertas} alerta{totalAlertas > 1 ? 's' : ''}
+                {t('alertBadge', { count: totalAlertas })}
               </span>
             )}
           </div>
@@ -224,7 +227,7 @@ export default async function DashboardPage() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="font-mono font-bold text-[11px] text-[#0a1a3c]">{c.container_number}</div>
-                    <span className="text-[9px] font-bold text-[#C05A00] bg-[#fdeee3] px-1.5 py-0.5 rounded">▲ Crítico</span>
+                    <span className="text-[9px] font-bold text-[#C05A00] bg-[#fdeee3] px-1.5 py-0.5 rounded">{t('alertCritical')}</span>
                   </div>
                   <div className="text-[10px] text-[#6b7a8a] mt-0.5">{clientName}</div>
                   <div className="text-[10px] text-[#C05A00] font-semibold mt-0.5">{t('detainedCustoms')}</div>
@@ -243,10 +246,10 @@ export default async function DashboardPage() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="font-mono font-bold text-[11px] text-[#0a1a3c]">{c.container_number}</div>
-                    <span className="text-[9px] font-bold text-[#B8860B] bg-[#fdf8ec] px-1.5 py-0.5 rounded">◆ Advertencia</span>
+                    <span className="text-[9px] font-bold text-[#B8860B] bg-[#fdf8ec] px-1.5 py-0.5 rounded">{t('alertWarning')}</span>
                   </div>
                   <div className="text-[10px] text-[#6b7a8a] mt-0.5">{clientName}</div>
-                  <div className="text-[10px] text-[#B8860B] font-semibold mt-0.5">Sin actualizar hace {days} días</div>
+                  <div className="text-[10px] text-[#B8860B] font-semibold mt-0.5">{t('notUpdated', { days })}</div>
                   <div className="text-[10px] text-[#8a9aaa]">{c.origin_port} → {c.destination_port}</div>
                 </a>
               )

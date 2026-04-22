@@ -1,29 +1,33 @@
+import { getTranslations } from 'next-intl/server'
 import { createUserAction } from '../../actions'
-
-const ERROR_MSG: Record<string, string> = {
-  auth:    'El email ya está registrado o hubo un problema al crear la cuenta.',
-  profile: 'La cuenta se creó pero no se pudo guardar el perfil. Contacta soporte.',
-}
 
 export default async function NuevoUsuarioPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const sp = await searchParams
+  const [sp, t] = await Promise.all([
+    searchParams,
+    getTranslations('admin'),
+  ])
+
+  const ERROR_MSG: Record<string, string> = {
+    auth:    t('errorAuth'),
+    profile: t('errorProfile'),
+  }
 
   return (
     <div className="p-8 max-w-[560px]">
       <div className="mb-8">
-        <a href="/admin/usuarios" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
-          ← Usuarios
+        <a href="/settings/users" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
+          {t('back')}
         </a>
-        <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-2">Nuevo Usuario</h1>
+        <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-2">{t('newUser')}</h1>
       </div>
 
       {sp.error && (
         <div className="mb-6 p-3 rounded-lg bg-[#fef4ed] border-l-[3px] border-[#C05A00] text-[#C05A00] text-xs font-bold">
-          ▲ {ERROR_MSG[sp.error] ?? 'Error al guardar. Verifica los datos.'}
+          ▲ {ERROR_MSG[sp.error] ?? t('errorSave')}
         </div>
       )}
 
@@ -32,7 +36,7 @@ export default async function NuevoUsuarioPage({
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Nombre completo *
+              {t('fullName')} *
             </label>
             <input
               name="full_name"
@@ -44,7 +48,7 @@ export default async function NuevoUsuarioPage({
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Email *
+              {t('email')} *
             </label>
             <input
               name="email"
@@ -57,22 +61,22 @@ export default async function NuevoUsuarioPage({
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Contraseña inicial *
+              {t('initialPassword')} *
             </label>
             <input
               name="password"
               type="password"
               required
               minLength={8}
-              placeholder="Mínimo 8 caracteres"
+              placeholder={t('minChars')}
               className="w-full bg-[#f7fafc] border-b-2 border-[#c5c6cf] focus:border-[#0a1a3c] outline-none py-2 text-sm font-semibold text-[#181c1e] transition-colors placeholder:font-normal placeholder:text-[#b0bac3]"
             />
-            <p className="text-[10px] text-[#b0bac3] mt-1">El usuario puede cambiarla después de su primer acceso.</p>
+            <p className="text-[10px] text-[#b0bac3] mt-1">{t('passwordNote')}</p>
           </div>
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Rol *
+              {t('role')} *
             </label>
             <select
               name="role"
@@ -80,24 +84,24 @@ export default async function NuevoUsuarioPage({
               defaultValue="operator"
               className="w-full bg-[#f7fafc] border-b-2 border-[#c5c6cf] focus:border-[#0a1a3c] outline-none py-2 text-sm font-bold text-[#0a1a3c] transition-colors"
             >
-              <option value="operator">Operador — Gestiona contenedores, clientes y facturas</option>
-              <option value="director">Director — Solo lectura, reportes y métricas</option>
-              <option value="client_viewer">Cliente — Ve únicamente sus propios envíos</option>
-              <option value="super_admin">Super Admin — Acceso total al sistema</option>
+              <option value="operator">{t('roleOperatorDesc')}</option>
+              <option value="director">{t('roleDirectorDesc')}</option>
+              <option value="client_viewer">{t('roleClientDesc')}</option>
+              <option value="super_admin">{t('roleAdminDesc')}</option>
             </select>
           </div>
 
           <div className="bg-[#f7fafc] rounded-lg p-4 text-[11px] text-[#6b7a8a] space-y-1">
-            <p className="font-bold text-[#0a1a3c] text-[10px] uppercase tracking-widest mb-2">Permisos por rol</p>
-            <p><strong>Operador:</strong> Crea y edita contenedores, clientes, facturas. Cambia estados.</p>
-            <p><strong>Director:</strong> Ve todo el sistema. No puede crear ni modificar.</p>
-            <p><strong>Cliente:</strong> Acceso solo a sus propios contenedores e historial de facturas.</p>
-            <p><strong>Super Admin:</strong> Todo lo anterior + gestión de usuarios.</p>
+            <p className="font-bold text-[#0a1a3c] text-[10px] uppercase tracking-widest mb-2">{t('permissionsTitle')}</p>
+            <p><strong>{t('roles.operator')}:</strong> {t('permOperator')}</p>
+            <p><strong>{t('roles.director')}:</strong> {t('permDirector')}</p>
+            <p><strong>{t('roles.client_viewer')}:</strong> {t('permClient')}</p>
+            <p><strong>{t('roles.super_admin')}:</strong> {t('permAdmin')}</p>
           </div>
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Idioma de la interfaz *
+              {t('language')} *
             </label>
             <select
               name="language"
@@ -105,9 +109,9 @@ export default async function NuevoUsuarioPage({
               defaultValue="es"
               className="w-full bg-[#f7fafc] border-b-2 border-[#c5c6cf] focus:border-[#0a1a3c] outline-none py-2 text-sm font-bold text-[#0a1a3c] transition-colors"
             >
-              <option value="es">🇲🇽 Español</option>
-              <option value="en">🇺🇸 English</option>
-              <option value="zh">🇨🇳 中文</option>
+              <option value="es">🇲🇽 {t('languages.es')}</option>
+              <option value="en">🇺🇸 {t('languages.en')}</option>
+              <option value="zh">🇨🇳 {t('languages.zh')}</option>
             </select>
           </div>
 
@@ -116,13 +120,13 @@ export default async function NuevoUsuarioPage({
               type="submit"
               className="bg-[#0a1a3c] text-white font-bold text-sm px-6 py-2.5 rounded-md hover:bg-[#142a5c] transition-colors"
             >
-              Crear Usuario
+              {t('createUser')}
             </button>
             <a
-              href="/admin/usuarios"
+              href="/settings/users"
               className="text-sm font-semibold text-[#8a9aaa] px-4 py-2.5 hover:text-[#181c1e] transition-colors"
             >
-              Cancelar
+              {t('cancel')}
             </a>
           </div>
         </form>

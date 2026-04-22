@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { createInvoiceAction } from '../../../actions'
 
 type Client = { id: string; name: string }
@@ -15,6 +16,9 @@ export function InvoiceForm({
   containerId: string
   clients: Client[]
 }) {
+  const t = useTranslations('invoices')
+  const locale = useLocale()
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
   const [items, setItems] = useState<Item[]>([{ ...EMPTY_ITEM }])
 
   function addItem() {
@@ -44,14 +48,14 @@ export function InvoiceForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
           <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-            Cliente *
+            {t('clientLabel')} *
           </label>
           <select
             name="client_id"
             required
             className="w-full bg-[#f7fafc] border-b-2 border-[#c5c6cf] focus:border-[#0a1a3c] outline-none py-2 text-sm font-bold text-[#0a1a3c] transition-colors"
           >
-            <option value="">— Selecciona cliente —</option>
+            <option value="">{t('selectClient')}</option>
             {clients.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
@@ -60,7 +64,7 @@ export function InvoiceForm({
 
         <div>
           <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-            Número de Factura *
+            {t('invoiceNumberLabel')} *
           </label>
           <input
             name="invoice_number"
@@ -72,7 +76,7 @@ export function InvoiceForm({
 
         <div>
           <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-            Moneda
+            {t('currency')}
           </label>
           <select
             name="currency"
@@ -87,7 +91,7 @@ export function InvoiceForm({
 
         <div className="col-span-2">
           <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-            Descripción general (opcional)
+            {t('generalDesc')}
           </label>
           <input
             name="description"
@@ -101,14 +105,14 @@ export function InvoiceForm({
       <div>
         <div className="flex items-center justify-between mb-3">
           <span className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">
-            Mercancía / Items
+            {t('merchandise')}
           </span>
           <button
             type="button"
             onClick={addItem}
             className="text-[10px] font-bold text-[#4A6FA5] hover:text-[#0a1a3c] transition-colors"
           >
-            + Agregar línea
+            {t('addLine')}
           </button>
         </div>
 
@@ -116,11 +120,11 @@ export function InvoiceForm({
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-[#f7fafc] border-b border-[#f0f2f5]">
-                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">Descripción</th>
-                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-20">Cant.</th>
-                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-20">Unidad</th>
-                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-28">Precio Unit.</th>
-                <th className="px-3 py-2 text-right text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-24">Total</th>
+                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('descriptionCol')}</th>
+                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-20">{t('qtyCol')}</th>
+                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-20">{t('unitCol')}</th>
+                <th className="px-3 py-2 text-left text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-28">{t('unitPriceCol')}</th>
+                <th className="px-3 py-2 text-right text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] w-24">{t('totalCol')}</th>
                 <th className="w-8" />
               </tr>
             </thead>
@@ -134,7 +138,7 @@ export function InvoiceForm({
                         name={`items[${i}][description]`}
                         value={item.description}
                         onChange={e => updateItem(i, 'description', e.target.value)}
-                        placeholder="Descripción del producto"
+                        placeholder={t('productDesc')}
                         required
                         className="w-full bg-transparent outline-none text-[#181c1e] placeholder:text-[#c5c6cf]"
                       />
@@ -171,7 +175,7 @@ export function InvoiceForm({
                       />
                     </td>
                     <td className="px-2 py-1.5 text-right font-bold text-[#0a1a3c]">
-                      {lineTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      {lineTotal.toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-2 py-1.5">
                       {items.length > 1 && (
@@ -191,10 +195,10 @@ export function InvoiceForm({
             <tfoot>
               <tr className="bg-[#f7fafc]">
                 <td colSpan={4} className="px-3 py-2 text-right text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa]">
-                  Total Calculado
+                  {t('calculatedTotal')}
                 </td>
                 <td className="px-3 py-2 text-right font-extrabold text-[#0a1a3c]">
-                  {total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  {total.toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
                 </td>
                 <td />
               </tr>
@@ -204,7 +208,7 @@ export function InvoiceForm({
 
         <div className="mt-3">
           <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-            Valor Declarado Total (para aduana)
+            {t('declaredValueCustoms')}
           </label>
           <input
             name="declared_value"
@@ -215,7 +219,7 @@ export function InvoiceForm({
             placeholder="0.00"
             className="w-full bg-[#f7fafc] border-b-2 border-[#c5c6cf] focus:border-[#0a1a3c] outline-none py-2 text-sm font-semibold text-[#181c1e] transition-colors placeholder:font-normal placeholder:text-[#b0bac3]"
           />
-          <p className="text-[10px] text-[#b0bac3] mt-1">Se usa para trámites de aduana. Puede diferir del total calculado.</p>
+          <p className="text-[10px] text-[#b0bac3] mt-1">{t('declaredValueNote')}</p>
         </div>
       </div>
 
@@ -224,13 +228,13 @@ export function InvoiceForm({
           type="submit"
           className="bg-[#0a1a3c] text-white font-bold text-sm px-6 py-2.5 rounded-md hover:bg-[#142a5c] transition-colors"
         >
-          Guardar Factura
+          {t('saveInvoice')}
         </button>
         <a
           href={`/contenedores/${containerId}`}
           className="text-sm font-semibold text-[#8a9aaa] px-4 py-2.5 hover:text-[#181c1e] transition-colors"
         >
-          Cancelar
+          {t('cancel')}
         </a>
       </div>
     </form>

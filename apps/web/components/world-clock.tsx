@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useLocale } from 'next-intl'
 
 function getTime(timeZone: string) {
   return new Date().toLocaleTimeString('en-GB', {
@@ -10,8 +11,8 @@ function getTime(timeZone: string) {
   })
 }
 
-function getDate(timeZone: string) {
-  return new Date().toLocaleDateString('es-MX', {
+function getDate(timeZone: string, jsLocale: string) {
+  return new Date().toLocaleDateString(jsLocale, {
     timeZone,
     weekday: 'short',
     day: '2-digit',
@@ -21,22 +22,24 @@ function getDate(timeZone: string) {
 
 export function WorldClock() {
   const [tick, setTick] = useState(0)
+  const locale = useLocale()
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 30000) // refresh every 30s
+    const id = setInterval(() => setTick(t => t + 1), 30000)
     return () => clearInterval(id)
   }, [])
 
-  const cnTime   = getTime('Asia/Shanghai')
-  const cnDate   = getDate('Asia/Shanghai')
-  const mxTime   = getTime('America/Mexico_City')
-  const mxDate   = getDate('America/Mexico_City')
+  const cnTime = getTime('Asia/Shanghai')
+  const cnDate = getDate('Asia/Shanghai', jsLocale)
+  const mxTime = getTime('America/Mexico_City')
+  const mxDate = getDate('America/Mexico_City', jsLocale)
 
   return (
     <div className="px-4 pb-4 pt-1 space-y-1.5">
       {[
-        { flag: '🇨🇳', label: 'China',   time: cnTime, date: cnDate },
-        { flag: '🇲🇽', label: 'México',  time: mxTime, date: mxDate },
+        { flag: '🇨🇳', label: 'CN', time: cnTime, date: cnDate },
+        { flag: '🇲🇽', label: 'MX', time: mxTime, date: mxDate },
       ].map(({ flag, label, time, date }) => (
         <div
           key={label}

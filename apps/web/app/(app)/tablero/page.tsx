@@ -1,6 +1,6 @@
 import { getContainersByStatus } from '@/lib/containers'
 import { StatusBadge, STATUS_CONFIG, type ContainerStatus } from '@/components/status-badge'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 
 const COLUMNS: ContainerStatus[] = [
   'en_puerto_origen', 'zarpo', 'en_transito_maritimo', 'eta_puerto_destino',
@@ -8,12 +8,14 @@ const COLUMNS: ContainerStatus[] = [
 ]
 
 export default async function TableroPage() {
-  const [containers, t, tn, tc] = await Promise.all([
+  const [containers, t, tn, tc, locale] = await Promise.all([
     getContainersByStatus(),
     getTranslations('status'),
     getTranslations('nav'),
     getTranslations('containers'),
+    getLocale(),
   ])
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   const byStatus = COLUMNS.reduce((acc, s) => {
     acc[s] = containers.filter(c => c.current_status === s)
@@ -98,7 +100,7 @@ export default async function TableroPage() {
                         </div>
                         {c.eta_date && (
                           <div className="text-[9px] font-bold text-[#8a9aaa] mt-1.5">
-                            ETA {new Date(c.eta_date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })}
+                            ETA {new Date(c.eta_date).toLocaleDateString(jsLocale, { day: '2-digit', month: 'short' })}
                           </div>
                         )}
                       </a>

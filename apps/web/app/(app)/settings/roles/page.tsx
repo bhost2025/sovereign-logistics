@@ -1,21 +1,23 @@
-const PERMISSIONS = [
-  { key: 'view_containers',   label: 'Ver contenedores',        director: true,  operator: true,  operatorCn: true,  admin: true  },
-  { key: 'edit_containers',   label: 'Editar contenedores',     director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'create_containers', label: 'Crear contenedores',      director: false, operator: true,  operatorCn: false, admin: true  },
-  { key: 'upload_docs',       label: 'Subir documentos',        director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'approve_docs',      label: 'Aprobar documentos',      director: true,  operator: false, operatorCn: false, admin: true  },
-  { key: 'create_alerts',     label: 'Crear alertas',           director: false, operator: true,  operatorCn: true,  admin: true  },
-  { key: 'resolve_alerts',    label: 'Resolver alertas',        director: true,  operator: true,  operatorCn: false, admin: true  },
-  { key: 'export_data',       label: 'Exportar datos',          director: true,  operator: false, operatorCn: false, admin: true  },
-  { key: 'manage_clients',    label: 'Gestionar clientes',      director: true,  operator: true,  operatorCn: false, admin: true  },
-  { key: 'manage_settings',   label: 'Gestionar configuración', director: false, operator: false, operatorCn: false, admin: true  },
+import { getTranslations } from 'next-intl/server'
+
+const PERMISSION_KEYS = [
+  { key: 'viewContainers',   director: true,  operator: true,  operatorCn: true,  admin: true  },
+  { key: 'editContainers',   director: false, operator: true,  operatorCn: true,  admin: true  },
+  { key: 'createContainers', director: false, operator: true,  operatorCn: false, admin: true  },
+  { key: 'uploadDocs',       director: false, operator: true,  operatorCn: true,  admin: true  },
+  { key: 'approveDocs',      director: true,  operator: false, operatorCn: false, admin: true  },
+  { key: 'createAlerts',     director: false, operator: true,  operatorCn: true,  admin: true  },
+  { key: 'resolveAlerts',    director: true,  operator: true,  operatorCn: false, admin: true  },
+  { key: 'exportData',       director: true,  operator: false, operatorCn: false, admin: true  },
+  { key: 'manageClients',    director: true,  operator: true,  operatorCn: false, admin: true  },
+  { key: 'manageSettings',   director: false, operator: false, operatorCn: false, admin: true  },
 ]
 
-const ROLES = [
-  { key: 'director',    label: 'Director',       color: '#B8860B', bg: '#fdf8ec' },
-  { key: 'operator',    label: 'Operador MX',    color: '#4A6FA5', bg: '#eef2f8' },
-  { key: 'operatorCn',  label: 'Operador China', color: '#1A7A8A', bg: '#edf6f7' },
-  { key: 'admin',       label: 'Super Admin',    color: '#0a1a3c', bg: '#f0f2f5' },
+const ROLE_COLORS = [
+  { key: 'director',   color: '#B8860B', bg: '#fdf8ec' },
+  { key: 'operator',   color: '#4A6FA5', bg: '#eef2f8' },
+  { key: 'operatorCn', color: '#1A7A8A', bg: '#edf6f7' },
+  { key: 'admin',      color: '#0a1a3c', bg: '#f0f2f5' },
 ]
 
 function Cell({ granted }: { granted: boolean }) {
@@ -29,14 +31,23 @@ function Cell({ granted }: { granted: boolean }) {
   )
 }
 
-export default function SettingsRolesPage() {
+export default async function SettingsRolesPage() {
+  const [t] = await Promise.all([
+    getTranslations('settings'),
+  ])
+
+  const ROLES = [
+    { key: 'director',   label: t('permMatrix.director'),   color: '#B8860B', bg: '#fdf8ec' },
+    { key: 'operator',   label: t('permMatrix.operator'),   color: '#4A6FA5', bg: '#eef2f8' },
+    { key: 'operatorCn', label: t('permMatrix.operatorCn'), color: '#1A7A8A', bg: '#edf6f7' },
+    { key: 'admin',      label: t('permMatrix.admin'),      color: '#0a1a3c', bg: '#f0f2f5' },
+  ]
+
   return (
     <div className="p-8 max-w-[860px]">
       <div className="mb-8">
-        <h1 className="text-xl font-extrabold text-[#0a1a3c] tracking-tight">Roles y Permisos</h1>
-        <p className="text-[11px] text-[#8a9aaa] mt-0.5">
-          Matriz de permisos por rol · La seguridad real se aplica vía RLS en Supabase
-        </p>
+        <h1 className="text-xl font-extrabold text-[#0a1a3c] tracking-tight">{t('roles')}</h1>
+        <p className="text-[11px] text-[#8a9aaa] mt-0.5">{t('rolesSubtitle')}</p>
       </div>
 
       {/* Role cards */}
@@ -58,7 +69,7 @@ export default function SettingsRolesPage() {
           <thead>
             <tr className="border-b border-[#f0f2f5]">
               <th className="px-5 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa] w-[280px]">
-                Permiso
+                {t('permMatrix.permission')}
               </th>
               {ROLES.map(r => (
                 <th key={r.key} className="px-5 py-3 text-center text-[10px] font-bold uppercase tracking-widest" style={{ color: r.color }}>
@@ -68,9 +79,9 @@ export default function SettingsRolesPage() {
             </tr>
           </thead>
           <tbody>
-            {PERMISSIONS.map((p, i) => (
+            {PERMISSION_KEYS.map((p, i) => (
               <tr key={p.key} className={`border-b border-[#f7fafc] ${i % 2 === 0 ? '' : 'bg-[#fafbfc]'}`}>
-                <td className="px-5 py-3 font-semibold text-[#181c1e]">{p.label}</td>
+                <td className="px-5 py-3 font-semibold text-[#181c1e]">{t(`permMatrix.${p.key}` as any)}</td>
                 <Cell granted={p.director} />
                 <Cell granted={p.operator} />
                 <Cell granted={p.operatorCn} />
@@ -81,10 +92,7 @@ export default function SettingsRolesPage() {
         </table>
       </div>
 
-      <p className="text-[10px] text-[#b0bac3] mt-4">
-        ◎ La edición granular de permisos por usuario estará disponible en una próxima versión.
-        Las políticas actuales se definen en el esquema RLS de Supabase.
-      </p>
+      <p className="text-[10px] text-[#b0bac3] mt-4">◎ {t('noteRoles')}</p>
     </div>
   )
 }

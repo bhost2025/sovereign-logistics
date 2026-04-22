@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import {
   getContainerDocuments,
   groupDocumentsByCategory,
@@ -9,7 +9,7 @@ import {
 import { UploadDocumentForm } from './upload-document-form'
 import { updateDocumentStatus, deleteDocument } from '@/app/(app)/contenedores/[id]/documents/actions'
 
-function DocStatusBadge({ status }: { status: ContainerDocument['doc_status'] }) {
+function DocStatusBadge({ status, label }: { status: ContainerDocument['doc_status']; label: string }) {
   const cfg = DOC_STATUS_CONFIG[status]
   return (
     <span
@@ -17,7 +17,7 @@ function DocStatusBadge({ status }: { status: ContainerDocument['doc_status'] })
       style={{ color: cfg.color, background: cfg.bg }}
     >
       <span className="w-[3px] self-stretch rounded-l" style={{ background: cfg.color }} />
-      {cfg.symbol} {cfg.label}
+      {cfg.symbol} {label}
     </span>
   )
 }
@@ -29,7 +29,7 @@ function DocumentRow({
 }: {
   doc: ContainerDocument
   containerId: string
-  labels: { view: string; download: string; approve: string; reject: string; byUploader: string }
+  labels: { view: string; download: string; approve: string; reject: string; byUploader: string; statusLabel: (s: ContainerDocument['doc_status']) => string; dateLocale: string }
 }) {
   const approveAction = updateDocumentStatus.bind(null, doc.id, containerId, 'approved')
   const rejectAction  = updateDocumentStatus.bind(null, doc.id, containerId, 'rejected')
@@ -40,13 +40,13 @@ function DocumentRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-semibold text-[#181c1e] truncate">{doc.file_name}</span>
-          <DocStatusBadge status={doc.doc_status} />
+          <DocStatusBadge status={doc.doc_status} label={labels.statusLabel(doc.doc_status)} />
         </div>
         <div className="flex items-center gap-3 text-[10px] text-[#8a9aaa]">
           {doc.uploader?.full_name && (
             <span>{labels.byUploader} {doc.uploader.full_name}</span>
           )}
-          <span>{new Date(doc.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          <span>{new Date(doc.created_at).toLocaleDateString(labels.dateLocale, { day: '2-digit', month: 'short', year: 'numeric' })}</span>
         </div>
         {doc.comments && (
           <p className="text-[10px] text-[#6b7a8a] mt-1 italic">{doc.comments}</p>
@@ -102,10 +102,12 @@ export async function DocumentsTab({
   containerId: string
   filterStatus?: string
 }) {
-  const [docs, t] = await Promise.all([
+  const [docs, t, locale] = await Promise.all([
     getContainerDocuments(containerId),
     getTranslations('documents'),
+    getLocale(),
   ])
+  const dl = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   const groups  = groupDocumentsByCategory(docs)
   const missing = getMissingRequiredCategories(docs)
@@ -115,11 +117,13 @@ export async function DocumentsTab({
   const pendingDocs  = docs.filter(d => d.doc_status === 'pending_review' || d.doc_status === 'uploaded').length
 
   const docLabels = {
-    view:       t('preview'),
-    download:   t('download'),
-    approve:    t('approve'),
-    reject:     t('reject'),
-    byUploader: t('byUploader'),
+    view:        t('preview'),
+    download:    t('download'),
+    approve:     t('approve'),
+    reject:      t('reject'),
+    byUploader:  t('byUploader'),
+    statusLabel: (s: ContainerDocument['doc_status']) => t(`status.${s}` as any),
+    dateLocale:  dl,
   }
 
   return (
@@ -134,7 +138,7 @@ export async function DocumentsTab({
           <div className="flex flex-wrap gap-1.5 mt-2">
             {missing.map(cat => (
               <span key={cat.slug} className="text-[10px] font-semibold bg-[#fdeee3] text-[#C05A00] px-2 py-0.5 rounded">
-                {cat.label}
+                {t(`categories.${cat.slug}` as any)}
               </span>
             ))}
           </div>
@@ -219,7 +223,7 @@ export async function DocumentsTab({
                 }}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-[#181c1e]">{group.label}</span>
+                  <span className="text-[11px] font-bold text-[#181c1e]">{t(`categories.${group.slug}` as any)}</span>
                   {group.required && (
                     <span className="text-[9px] font-bold text-[#8a9aaa] uppercase tracking-wider">{t('required')}</span>
                   )}

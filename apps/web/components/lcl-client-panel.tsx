@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { addProduct, deleteProduct } from '@/app/(app)/contenedores/[id]/products/actions'
 
 type Client = {
@@ -53,6 +53,8 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
   const t  = useTranslations('cargo')
   const tc = useTranslations('containers')
   const ti = useTranslations('invoices')
+  const locale = useLocale()
+  const jsLocale = locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX'
 
   const activeClient     = clients.find(cc => cc.clients?.id === openClientId)
   const clientProducts   = products.filter(p => p.client_id === openClientId)
@@ -141,7 +143,7 @@ export function LclClientPanel({ containerId, clients, products, invoices, isLcl
             <div className="flex items-center justify-between bg-white rounded-lg px-4 py-2.5">
               <span className="text-[10px] font-bold uppercase tracking-widest text-[#8a9aaa]">{t('declaredTotal')}</span>
               <span className="text-sm font-extrabold text-[#0a1a3c]">
-                USD {clientDeclaredTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                USD {clientDeclaredTotal.toLocaleString(jsLocale, { minimumFractionDigits: 2 })}
               </span>
             </div>
           )}

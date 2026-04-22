@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { createClientAction } from '../actions'
 
 export default async function NuevoClientePage({
@@ -5,20 +6,23 @@ export default async function NuevoClientePage({
 }: {
   searchParams: Promise<{ error?: string }>
 }) {
-  const params = await searchParams
+  const [params, t] = await Promise.all([
+    searchParams,
+    getTranslations('clients'),
+  ])
 
   return (
     <div className="p-8 max-w-[640px]">
       <div className="mb-8">
         <a href="/clientes" className="text-[10px] font-bold text-[#8a9aaa] hover:text-[#181c1e] tracking-widest uppercase">
-          ← Clientes
+          ← {t('title')}
         </a>
-        <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-2">Nuevo Cliente</h1>
+        <h1 className="text-2xl font-extrabold text-[#0a1a3c] tracking-tight mt-2">{t('newClientTitle')}</h1>
       </div>
 
       {params.error && (
         <div className="mb-6 p-3 rounded-lg bg-[#fef4ed] border-l-[3px] border-[#C05A00] text-[#C05A00] text-xs font-bold">
-          ▲ Error al guardar. Verifica los datos e intenta de nuevo.
+          ▲ {t('errorSave')}
         </div>
       )}
 
@@ -26,7 +30,7 @@ export default async function NuevoClientePage({
         <form action={createClientAction} className="space-y-6">
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Nombre de la Empresa *
+              {t('companyName')} *
             </label>
             <input
               name="name"
@@ -38,7 +42,7 @@ export default async function NuevoClientePage({
 
           <div>
             <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-              Nombre de Contacto
+              {t('contactName')}
             </label>
             <input
               name="contact_name"
@@ -50,7 +54,7 @@ export default async function NuevoClientePage({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-                Email
+                {t('email')}
               </label>
               <input
                 name="email"
@@ -61,7 +65,7 @@ export default async function NuevoClientePage({
             </div>
             <div>
               <label className="text-[9px] font-bold uppercase tracking-widest text-[#8a9aaa] block mb-1.5">
-                Teléfono
+                {t('phone')}
               </label>
               <input
                 name="phone"
@@ -76,13 +80,13 @@ export default async function NuevoClientePage({
               type="submit"
               className="bg-[#0a1a3c] text-white font-bold text-sm px-6 py-2.5 rounded-md hover:bg-[#142a5c] transition-colors"
             >
-              Registrar Cliente
+              {t('registerClient')}
             </button>
             <a
               href="/clientes"
               className="text-sm font-semibold text-[#8a9aaa] px-4 py-2.5 hover:text-[#181c1e] transition-colors"
             >
-              Cancelar
+              {t('cancel')}
             </a>
           </div>
         </form>

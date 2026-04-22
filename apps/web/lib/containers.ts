@@ -69,7 +69,7 @@ export async function getContainersProximosEta(days = 30) {
   return data ?? []
 }
 
-export async function getDirectorStats() {
+export async function getDirectorStats(locale = 'es') {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createClient() as any
 
@@ -113,7 +113,7 @@ export async function getDirectorStats() {
   })
   const containersByMonth = last6.map(m => ({
     month: m,
-    label: new Date(m + '-01').toLocaleDateString('es-MX', { month: 'short', year: '2-digit' }),
+    label: new Date(m + '-01').toLocaleDateString(locale === 'zh' ? 'zh-CN' : locale === 'en' ? 'en-US' : 'es-MX', { month: 'short', year: '2-digit' }),
     count: byMonth[m] ?? 0,
   }))
 
