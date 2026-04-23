@@ -10,6 +10,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   if (profile.role !== 'super_admin') redirect('/tablero')
 
   const SUB_NAV = [
+    { href: '/settings/empresa',       label: t('company'),       icon: '◆', group: 'main' },
     { href: '/settings/users',         label: t('users'),         icon: '◎', group: 'main' },
     { href: '/settings/roles',         label: t('roles'),         icon: '◈', group: 'main' },
     { href: '/settings/statuses',      label: t('statuses'),      icon: '◆', group: 'main' },

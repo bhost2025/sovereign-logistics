@@ -452,7 +452,18 @@
       "viewLogs": "Ver registros de actividad",
       "runBackup": "Ejecutar respaldo",
       "runCleanup": "Ejecutar limpieza"
-    }
+    },
+    "company": "Empresa",
+    "companyTitle": "Datos de la Empresa",
+    "companySubtitle": "Nombre e identidad visual de tu organización",
+    "companyName": "Nombre de la empresa",
+    "companyNameRequired": "El nombre de la empresa es obligatorio",
+    "companySlug": "Identificador (slug)",
+    "companySlugNote": "Solo lectura",
+    "companyLogo": "URL del logotipo",
+    "companyLogoNote": "URL pública de imagen (png, jpg, svg). Se muestra en el encabezado.",
+    "companyInfo": "Información del sistema",
+    "companyCreated": "Alta en el sistema"
   },
   "admin": {
     "title": "Usuarios",

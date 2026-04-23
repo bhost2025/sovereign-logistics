@@ -452,7 +452,18 @@
       "viewLogs": "View activity logs",
       "runBackup": "Run backup",
       "runCleanup": "Run cleanup"
-    }
+    },
+    "company": "Company",
+    "companyTitle": "Company Details",
+    "companySubtitle": "Name and visual identity of your organization",
+    "companyName": "Company name",
+    "companyNameRequired": "Company name is required",
+    "companySlug": "Identifier (slug)",
+    "companySlugNote": "Read only",
+    "companyLogo": "Logo URL",
+    "companyLogoNote": "Public image URL (png, jpg, svg). Shown in the header.",
+    "companyInfo": "System information",
+    "companyCreated": "Created on"
   },
   "admin": {
     "title": "Users",

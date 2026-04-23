@@ -452,7 +452,18 @@
       "viewLogs": "查看操作日志",
       "runBackup": "执行备份",
       "runCleanup": "执行系统清理"
-    }
+    },
+    "company": "企业信息",
+    "companyTitle": "企业资料",
+    "companySubtitle": "组织名称与视觉标识",
+    "companyName": "企业名称",
+    "companyNameRequired": "企业名称不能为空",
+    "companySlug": "标识符（slug）",
+    "companySlugNote": "只读",
+    "companyLogo": "Logo 网址",
+    "companyLogoNote": "公开图片链接（png、jpg、svg），显示在顶部导航栏。",
+    "companyInfo": "系统信息",
+    "companyCreated": "创建日期"
   },
   "admin": {
     "title": "用户管理",
