@@ -40,10 +40,10 @@ export default async function SettingsRolesPage({
   const activeRole = params.role ?? 'director'
 
   const supabase = await createClient()
-  const { data: rows } = await supabase
+  const { data: rows } = await (supabase as any)
     .from('role_permissions')
     .select('role, permission, granted')
-    .eq('company_id', profile.company_id) as any
+    .eq('company_id', profile.company_id)
 
   const permMap: Record<string, Record<string, boolean>> = {}
   for (const r of ROLES) permMap[r.key] = {}

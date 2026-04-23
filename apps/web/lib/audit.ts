@@ -26,7 +26,7 @@ export async function writeLog(params: WriteLogParams): Promise<void> {
       getUserProfile(),
     ])
 
-    await supabase.from('system_logs').insert({
+    await (supabase as any).from('system_logs').insert({
       company_id:   profile.company_id,
       user_id:      profile.id,
       user_name:    profile.full_name,
@@ -35,7 +35,7 @@ export async function writeLog(params: WriteLogParams): Promise<void> {
       entity_id:    params.entity_id   ?? null,
       entity_label: params.entity_label ?? null,
       changes:      params.changes      ?? null,
-    } as any)
+    })
   } catch {
     // Audit logging must never crash the main operation
     console.error('[audit] writeLog failed — continuing without log')

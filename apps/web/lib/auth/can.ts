@@ -15,13 +15,13 @@ export async function can(permission: string): Promise<boolean> {
     if (profile.role === SUPER_ADMIN_ROLE) return true
 
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from('role_permissions')
       .select('granted')
       .eq('company_id', profile.company_id)
       .eq('role', profile.role)
       .eq('permission', permission)
-      .single() as any
+      .single()
 
     return data?.granted === true
   } catch {

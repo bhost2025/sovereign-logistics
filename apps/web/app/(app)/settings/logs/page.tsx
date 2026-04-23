@@ -82,7 +82,7 @@ export default async function SettingsLogsPage({
     .not('user_name', 'is', null)
     .order('user_name')
 
-  const uniqueUsers: string[] = [...new Set((usersUniq ?? []).map((r: any) => r.user_name))]
+  const uniqueUsers = Array.from(new Set<string>((usersUniq ?? []).map((r: any) => r.user_name as string)))
 
   const ENTITY_TYPES = ['container','client','user','invoice','document','agency','port','role_permission','email_config','system']
   const ALL_ACTIONS  = ['create','update','delete','restore','login','logout','export','backup','cleanup','permission_change','test_email']

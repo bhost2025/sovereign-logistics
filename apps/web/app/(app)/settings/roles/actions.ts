@@ -23,9 +23,9 @@ export async function saveRolePermissions(
     updated_at:  new Date().toISOString(),
   }))
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('role_permissions')
-    .upsert(upserts, { onConflict: 'company_id,role,permission' }) as any
+    .upsert(upserts, { onConflict: 'company_id,role,permission' })
 
   if (error) throw error
 
