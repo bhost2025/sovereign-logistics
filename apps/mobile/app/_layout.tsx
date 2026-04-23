@@ -3,6 +3,7 @@ import { Stack, router, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { ActivityIndicator, View } from 'react-native'
 import { supabase } from '../lib/supabase'
+import { registerPushToken } from '../lib/push-token'
 import type { Session } from '@supabase/supabase-js'
 
 export default function RootLayout() {
@@ -32,6 +33,11 @@ export default function RootLayout() {
       router.replace('/(auth)/login')
     } else if (session && inAuth) {
       router.replace('/(tabs)')
+    }
+
+    // Register push token whenever a session is established
+    if (session) {
+      registerPushToken()
     }
   }, [session, segments])
 

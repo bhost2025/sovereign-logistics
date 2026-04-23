@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import nodemailer from 'nodemailer'
 
 export type NotificationEvent =
@@ -21,6 +22,13 @@ const EVENT_SUBJECT: Record<NotificationEvent, (p: NotificationPayload) => strin
   missing_docs:       (p) => `◱ Documentos faltantes: ${p.containerNumber}`,
   eta_soon:           (p) => `◎ ETA en ${p.daysLeft} días: ${p.containerNumber}`,
   not_updated:        (p) => `◈ Sin actualizar hace ${p.daysSince} días: ${p.containerNumber}`,
+}
+
+const EVENT_PUSH_BODY: Record<NotificationEvent, (p: NotificationPayload) => string> = {
+  container_detained: (p) => `${p.containerNumber} fue detenido en aduana. Acción requerida.`,
+  missing_docs:       (p) => `${p.containerNumber} tiene documentos pendientes de subir.`,
+  eta_soon:           (p) => `${p.containerNumber} llega en ${p.daysLeft} días. Verifica los documentos.`,
+  not_updated:        (p) => `${p.containerNumber} no ha sido actualizado en ${p.daysSince} días.`,
 }
 
 const EVENT_BODY: Record<NotificationEvent, (p: NotificationPayload) => string> = {
@@ -79,11 +87,91 @@ function buildEmailHtml(event: NotificationEvent, payload: NotificationPayload, 
 }
 
 /**
- * Dispatch an email notification for a container event.
- * Reads notification_settings to check if the event is enabled and which roles to notify.
- * Reads email_config for SMTP settings.
- * Reads users with the relevant roles to get their email addresses.
- * Never throws — notification failures must not break the main operation.
+ * Send Expo push notifications to all device tokens matching the given user IDs.
+ * Uses the Expo Push API directly (no SDK needed server-side).
+ * Returns the number of pushes successfully queued.
+ */
+async function dispatchPush(
+  event: NotificationEvent,
+  payload: NotificationPayload,
+  userIds: string[],
+): Promise<number> {
+  if (userIds.length === 0) return 0
+
+  const admin = createAdminClient()
+
+  // Get all active tokens for these users
+  const { data: tokenRows } = await (admin as any)
+    .from('device_tokens')
+    .select('token')
+    .in('user_id', userIds)
+
+  const tokens: string[] = (tokenRows ?? [])
+    .map((r: any) => r.token)
+    .filter((t: string) => t.startsWith('ExponentPushToken['))
+
+  if (tokens.length === 0) return 0
+
+  const messages = tokens.map(to => ({
+    to,
+    title: 'Sovereign Logistics',
+    body:  EVENT_PUSH_BODY[event](payload),
+    data:  { containerId: payload.containerId, event },
+    sound: 'default',
+  }))
+
+  // Expo Push API accepts up to 100 messages per request
+  const CHUNK = 100
+  let sent = 0
+  for (let i = 0; i < messages.length; i += CHUNK) {
+    const chunk = messages.slice(i, i + CHUNK)
+    const res = await fetch('https://exp.host/--/api/v2/push/send', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body:    JSON.stringify(chunk),
+    })
+    if (res.ok) sent += chunk.length
+  }
+
+  return sent
+}
+
+/**
+ * Write a row to notification_log. Never throws.
+ */
+async function writeNotificationLog(params: {
+  companyId:       string
+  event:           NotificationEvent
+  containerId:     string
+  containerNumber: string
+  channels:        string[]
+  recipientsCount: number
+  status:          'sent' | 'failed' | 'partial'
+  error?:          string
+}): Promise<void> {
+  try {
+    const admin = createAdminClient()
+    await (admin as any).from('notification_log').insert({
+      company_id:       params.companyId,
+      event_type:       params.event,
+      container_id:     params.containerId,
+      container_number: params.containerNumber,
+      channels:         params.channels,
+      recipients_count: params.recipientsCount,
+      status:           params.status,
+      error:            params.error ?? null,
+    })
+  } catch (err) {
+    console.error('[notifications] writeNotificationLog failed:', err)
+  }
+}
+
+/**
+ * Dispatch email + push notification for a container event.
+ * Reads notification_settings for enabled/push_enabled/notify_roles.
+ * Reads email_config for SMTP. Reads device_tokens for push.
+ * Writes a row to notification_log after each dispatch.
+ * Never throws — failures must not break the main operation.
  */
 export async function dispatchNotification(
   event: NotificationEvent,
@@ -96,7 +184,7 @@ export async function dispatchNotification(
     // 1. Check if this event is enabled
     const { data: setting } = await (supabase as any)
       .from('notification_settings')
-      .select('enabled, notify_roles, days_threshold')
+      .select('enabled, push_enabled, notify_roles, days_threshold')
       .eq('company_id', companyId)
       .eq('event_type', event)
       .single()
@@ -106,55 +194,87 @@ export async function dispatchNotification(
     const notifyRoles: string[] = setting.notify_roles ?? []
     if (notifyRoles.length === 0) return
 
-    // 2. Get SMTP config
+    // 2. Load target users (need both emails and IDs)
+    const { data: users } = await (supabase as any)
+      .from('users')
+      .select('id, email')
+      .eq('company_id', companyId)
+      .eq('is_active', true)
+      .in('role', notifyRoles)
+
+    const targetUsers: { id: string; email: string }[] = users ?? []
+    if (targetUsers.length === 0) return
+
+    const userIds    = targetUsers.map(u => u.id)
+    const emails     = targetUsers.map(u => u.email).filter(Boolean)
+
+    const channels: string[] = []
+    let emailSent  = false
+    let emailError: string | undefined
+
+    // 3. Email dispatch
     const { data: cfg } = await (supabase as any)
       .from('email_config')
       .select('*')
       .eq('company_id', companyId)
       .single()
 
-    if (!cfg?.smtp_host || !cfg?.smtp_user || !cfg?.smtp_pass || !cfg?.is_verified) {
-      // Email not configured or not verified — skip silently
-      return
+    if (cfg?.smtp_host && cfg?.smtp_user && cfg?.smtp_pass && cfg?.is_verified && emails.length > 0) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host:   cfg.smtp_host,
+          port:   cfg.smtp_port ?? 587,
+          secure: cfg.encryption === 'ssl',
+          auth:   { user: cfg.smtp_user, pass: cfg.smtp_pass },
+          ...(cfg.encryption === 'tls' ? { requireTLS: true } : {}),
+        })
+        const fromName  = cfg.from_name  ?? 'Sovereign Logistics'
+        const fromEmail = cfg.from_email ?? cfg.smtp_user
+        await transporter.sendMail({
+          from:    `"${fromName}" <${fromEmail}>`,
+          to:      emails.join(', '),
+          subject: EVENT_SUBJECT[event](payload),
+          html:    buildEmailHtml(event, payload, fromName),
+        })
+        channels.push('email')
+        emailSent = true
+        console.log(`[notifications] Email sent for ${event} to ${emails.length} recipients`)
+      } catch (err: any) {
+        emailError = err?.message ?? String(err)
+        console.error(`[notifications] Email failed for ${event}:`, err)
+      }
     }
 
-    // 3. Get recipient emails (users with the notified roles)
-    const { data: users } = await (supabase as any)
-      .from('users')
-      .select('email, full_name')
-      .eq('company_id', companyId)
-      .eq('is_active', true)
-      .in('role', notifyRoles)
+    // 4. Push dispatch (if push_enabled)
+    let pushCount = 0
+    if (setting.push_enabled) {
+      try {
+        pushCount = await dispatchPush(event, payload, userIds)
+        if (pushCount > 0) channels.push('push')
+        console.log(`[notifications] Push sent for ${event} to ${pushCount} devices`)
+      } catch (err) {
+        console.error(`[notifications] Push failed for ${event}:`, err)
+      }
+    }
 
-    const recipients: string[] = (users ?? [])
-      .map((u: any) => u.email)
-      .filter(Boolean)
+    // 5. Log result
+    const totalRecipients = (emailSent ? emails.length : 0) + pushCount
+    const status = totalRecipients > 0
+      ? (emailError ? 'partial' : 'sent')
+      : 'failed'
 
-    if (recipients.length === 0) return
-
-    // 4. Build and send email
-    const transporter = nodemailer.createTransport({
-      host:   cfg.smtp_host,
-      port:   cfg.smtp_port ?? 587,
-      secure: cfg.encryption === 'ssl',
-      auth:   { user: cfg.smtp_user, pass: cfg.smtp_pass },
-      ...(cfg.encryption === 'tls' ? { requireTLS: true } : {}),
+    await writeNotificationLog({
+      companyId,
+      event,
+      containerId:     payload.containerId,
+      containerNumber: payload.containerNumber,
+      channels,
+      recipientsCount: totalRecipients,
+      status,
+      error: emailError,
     })
-
-    const fromName  = cfg.from_name  ?? 'Sovereign Logistics'
-    const fromEmail = cfg.from_email ?? cfg.smtp_user
-
-    await transporter.sendMail({
-      from:    `"${fromName}" <${fromEmail}>`,
-      to:      recipients.join(', '),
-      subject: EVENT_SUBJECT[event](payload),
-      html:    buildEmailHtml(event, payload, fromName),
-    })
-
-    console.log(`[notifications] Sent ${event} to ${recipients.length} recipients`)
   } catch (err) {
-    // Never throw — email failures must not break container operations
-    console.error(`[notifications] Failed to dispatch ${event}:`, err)
+    console.error(`[notifications] dispatchNotification failed for ${event}:`, err)
   }
 }
 
@@ -166,7 +286,6 @@ export async function dispatchScheduledNotifications(companyId: string): Promise
   try {
     const supabase = await createClient()
 
-    // Fetch active containers
     const { data: containers } = await (supabase as any)
       .from('containers')
       .select('id, container_number, eta_date, updated_at, current_status')
@@ -176,7 +295,6 @@ export async function dispatchScheduledNotifications(companyId: string): Promise
 
     if (!containers?.length) return
 
-    // eta_soon setting
     const { data: etaSetting } = await (supabase as any)
       .from('notification_settings')
       .select('enabled, days_threshold')
@@ -184,7 +302,6 @@ export async function dispatchScheduledNotifications(companyId: string): Promise
       .eq('event_type', 'eta_soon')
       .single()
 
-    // not_updated setting
     const { data: staleSetting } = await (supabase as any)
       .from('notification_settings')
       .select('enabled, days_threshold')
@@ -195,7 +312,6 @@ export async function dispatchScheduledNotifications(companyId: string): Promise
     const now = Date.now()
 
     for (const c of containers) {
-      // ETA soon
       if (etaSetting?.enabled && c.eta_date) {
         const threshold = etaSetting.days_threshold ?? 3
         const daysLeft = Math.ceil((new Date(c.eta_date).getTime() - now) / 86400000)
@@ -209,7 +325,6 @@ export async function dispatchScheduledNotifications(companyId: string): Promise
         }
       }
 
-      // Not updated
       if (staleSetting?.enabled && c.updated_at) {
         const threshold = staleSetting.days_threshold ?? 5
         const daysSince = Math.floor((now - new Date(c.updated_at).getTime()) / 86400000)
